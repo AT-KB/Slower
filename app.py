@@ -50,23 +50,31 @@ if st.button("検索") and YT_KEY:
     for idx, vid in enumerate(results, 1):
         st.markdown(f"[{vid['title']}]({vid['url']})")
         if st.button("この動画で生成", key=vid["videoId"]):
-            with st.spinner("ダウンロードと文字起こし..."):
-                transcript = download_and_transcribe(vid["videoId"])
+            progress = st.progress(0)
+            status = st.empty()
 
-            with st.spinner("Gemini でスクリプト生成..."):
-                script = summarize_with_gemini(GEMINI_KEY, transcript)
-                st.text_area("生成されたスクリプト", script)
+            status.write("ダウンロードと文字起こし...")
+            transcript = download_and_transcribe(vid["videoId"])
+            progress.progress(0.33)
+
+            status.write("Gemini でスクリプト生成...")
+            script = summarize_with_gemini(GEMINI_KEY, transcript)
+            progress.progress(0.66)
+            st.text_area("生成されたスクリプト", script)
 
             out_lang = st.selectbox("音声言語", ["ja-JP", "en-US", "es-ES"])
             rate = st.slider("読み上げ速度", 0.25, 2.0, 1.0, 0.05)
 
-            with st.spinner("音声合成..."):
-                audio = synthesize_text_to_mp3(
-                    script, language_code=out_lang, speaking_rate=rate
-                )
+            status.write("音声合成...")
+            audio = synthesize_text_to_mp3(
+                script, language_code=out_lang, speaking_rate=rate
+            )
+            progress.progress(1.0)
+            status.write("生成完了！")
+
             st.audio(audio, format="audio/mp3")
             st.download_button(
-                label="MP3を保存",
+                "MP3を保存",
                 data=audio,
                 file_name=f"{vid['videoId']}.mp3",
                 mime="audio/mpeg",
