@@ -1,6 +1,6 @@
 streamlit
 yt-dlp
-openai-whisper
+openai-whisper==20231117
 google-api-python-client
 google-cloud-texttospeech
 google-generativeai
