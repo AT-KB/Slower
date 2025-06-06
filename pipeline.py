@@ -3,6 +3,7 @@
 import os
 from typing import List, Optional, Dict
 import re
+from urllib.parse import urlparse, parse_qs
 
 from googleapiclient.discovery import build
 from google.cloud import texttospeech_v1 as texttospeech
@@ -24,6 +25,44 @@ def _iso_duration_to_seconds(duration: str) -> int:
     minutes = int(match.group("m") or 0)
     seconds = int(match.group("s") or 0)
     return hours * 3600 + minutes * 60 + seconds
+
+
+def extract_video_id(url: str) -> Optional[str]:
+    """Extract a YouTube video ID from a URL or return None."""
+    if not url:
+        return None
+
+    # direct video id
+    if re.fullmatch(r"[A-Za-z0-9_-]{11}", url):
+        return url
+
+    parsed = urlparse(url)
+    host = parsed.hostname or ""
+
+    if host in {"youtu.be"}:
+        vid = parsed.path.lstrip("/")
+        return vid if vid else None
+
+    if host.endswith("youtube.com"):
+        if parsed.path == "/watch":
+            qs = parse_qs(parsed.query)
+            return qs.get("v", [None])[0]
+        segments = parsed.path.split("/")
+        if len(segments) >= 2 and segments[1] in {"embed", "shorts"}:
+            return segments[2] if len(segments) > 2 else None
+
+    return None
+
+
+def get_video_info(api_key: str, video_id: str) -> Optional[dict]:
+    """Retrieve basic video information by ID."""
+    youtube = build("youtube", "v3", developerKey=api_key)
+    resp = youtube.videos().list(part="snippet", id=video_id).execute()
+    items = resp.get("items", [])
+    if not items:
+        return None
+    title = items[0]["snippet"].get("title", "")
+    return {"videoId": video_id, "title": title, "url": f"https://youtu.be/{video_id}"}
 
 def search_videos(
     api_key: str,
