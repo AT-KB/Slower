@@ -80,12 +80,13 @@ if st.button("検索") and YT_KEY:
         if st.button("この動画で生成", key=vid["videoId"]):
             progress = st.progress(0)
             status = st.empty()
+            total_steps = 3
 
-            status.write("ダウンロードと文字起こし...")
+            status.write("ステップ1/3: ダウンロードと文字起こし")
             transcript = download_and_transcribe(vid["videoId"])
-            progress.progress(0.33)
+            progress.progress(1 / total_steps)
 
-            status.write("Gemini でスクリプト生成...")
+            status.write("ステップ2/3: Gemini でスクリプト生成")
             if not GEMINI_KEY:
                 st.warning(
                     "環境変数 GEMINI_API_KEY が設定されていないため、スクリプト生成をスキップします。"
@@ -95,18 +96,18 @@ if st.button("検索") and YT_KEY:
                 break
 
             script = summarize_with_gemini(GEMINI_KEY, transcript)
-            progress.progress(0.66)
+            progress.progress(2 / total_steps)
             st.text_area("生成されたスクリプト", script)
 
             out_lang = st.selectbox("音声言語", ["ja-JP", "en-US", "es-ES"])
             rate = st.slider("読み上げ速度", 0.25, 2.0, 1.0, 0.05)
 
-            status.write("音声合成...")
+            status.write("ステップ3/3: 音声合成")
             audio = synthesize_text_to_mp3(
                 script, language_code=out_lang, speaking_rate=rate
             )
-            progress.progress(1.0)
-            status.write("生成完了！")
+            progress.progress(3 / total_steps)
+            status.write("ステップ3/3: 音声合成完了！")
 
             st.audio(audio, format="audio/mp3")
             st.download_button(
