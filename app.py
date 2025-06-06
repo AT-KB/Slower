@@ -3,6 +3,8 @@
 import streamlit as st
 from pipeline import (
     search_videos,
+    extract_video_id,
+    get_video_info,
     download_and_transcribe,
     summarize_with_gemini,
     synthesize_text_to_mp3,
@@ -22,6 +24,7 @@ if not YT_KEY or not GEMINI_KEY:
     st.info("環境変数 YT_KEY と GEMINI_API_KEY を設定してください。")
 
 keyword = st.text_input("キーワードを入力")
+video_url = st.text_input("動画URL（任意）")
 lang = st.selectbox("言語", ["ja", "en", "es"])
 
 # 公開日の範囲
@@ -62,21 +65,34 @@ max_results = st.selectbox("出力件数", [10, 25, 40])
 
 if st.button("検索") and YT_KEY:
     with st.spinner("検索中..."):
-        results = search_videos(
-            YT_KEY,
-            keyword,
-            lang,
-            max_results=max_results,
-            video_duration=length,
-            published_after=f"{published_after}T00:00:00Z" if published_after else None,
-            published_before=f"{published_before}T00:00:00Z" if published_before else None,
-            min_view_count=int(min_views),
-            max_view_count=int(max_views) if max_views else None,
-            min_subscribers=int(min_subs),
-            max_subscribers=int(max_subs) if max_subs else None,
-            min_duration=int(min_length),
-            max_duration=int(max_length) if max_length else None,
-        )
+        if video_url:
+            vid_id = extract_video_id(video_url)
+            if not vid_id:
+                st.warning("URL から動画IDを取得できませんでした")
+                results = []
+            else:
+                info = get_video_info(YT_KEY, vid_id)
+                if info:
+                    results = [info]
+                else:
+                    st.warning("動画情報が見つかりませんでした")
+                    results = []
+        else:
+            results = search_videos(
+                YT_KEY,
+                keyword,
+                lang,
+                max_results=max_results,
+                video_duration=length,
+                published_after=f"{published_after}T00:00:00Z" if published_after else None,
+                published_before=f"{published_before}T00:00:00Z" if published_before else None,
+                min_view_count=int(min_views),
+                max_view_count=int(max_views) if max_views else None,
+                min_subscribers=int(min_subs),
+                max_subscribers=int(max_subs) if max_subs else None,
+                min_duration=int(min_length),
+                max_duration=int(max_length) if max_length else None,
+            )
 
     for idx, vid in enumerate(results, 1):
         st.markdown(f"[{vid['title']}]({vid['url']})")
