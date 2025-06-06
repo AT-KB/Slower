@@ -1,0 +1,6 @@
+streamlit
+yt-dlp
+openai-whisper
+google-api-python-client
+google-cloud-texttospeech
+google-generativeai
