@@ -7,6 +7,8 @@
 - Google Gemini API キー (`GEMINI_API_KEY`)
 - Google Cloud Text-to-Speech の認証情報
 
+環境変数 `GOOGLE_APPLICATION_CREDENTIALS` はサービスアカウント JSON ファイルへのパスを指定してください。
+
 これらの情報は環境変数として設定してください。
 
 ## セットアップ
