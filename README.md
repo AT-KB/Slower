@@ -16,6 +16,7 @@
    ```bash
    pip install -r requirements.txt
    ```
+   これにより、音声認識ライブラリ `openai-whisper` も自動でインストールされます。
 2. 環境変数を設定したら、次のコマンドでアプリを起動します。
    ```bash
    streamlit run app.py
