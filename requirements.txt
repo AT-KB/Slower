@@ -1,6 +1,5 @@
 streamlit
 yt-dlp
-faster-whisper
 google-api-python-client
 google-cloud-texttospeech
 google-generativeai
