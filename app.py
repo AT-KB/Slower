@@ -86,6 +86,14 @@ if st.button("検索") and YT_KEY:
             progress.progress(0.33)
 
             status.write("Gemini でスクリプト生成...")
+            if not GEMINI_KEY:
+                st.warning(
+                    "環境変数 GEMINI_API_KEY が設定されていないため、スクリプト生成をスキップします。"
+                )
+                progress.progress(1.0)
+                status.write("完了")
+                break
+
             script = summarize_with_gemini(GEMINI_KEY, transcript)
             progress.progress(0.66)
             st.text_area("生成されたスクリプト", script)
