@@ -80,7 +80,11 @@ def search_videos(
     min_duration: int = 0,
     max_duration: Optional[int] = None,
 ) -> List[dict]:
-    """Search YouTube videos and return list of results filtered by criteria."""
+    """Search YouTube videos and return list of results filtered by criteria.
+
+    Each result dictionary contains ``videoId``, ``title``, ``url``,
+    ``viewCount`` and ``subscriberCount``.
+    """
     youtube = build("youtube", "v3", developerKey=api_key)
 
     search_params: Dict[str, str] = {
@@ -145,7 +149,15 @@ def search_videos(
         if max_duration is not None and duration > max_duration:
             continue
 
-        results.append({"videoId": vid, "title": title, "url": url})
+        results.append(
+            {
+                "videoId": vid,
+                "title": title,
+                "url": url,
+                "viewCount": views,
+                "subscriberCount": subs,
+            }
+        )
         if len(results) >= max_results:
             break
 

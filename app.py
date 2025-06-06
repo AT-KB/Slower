@@ -104,6 +104,10 @@ if st.button("検索") and YT_KEY:
 
     for idx, vid in enumerate(results, 1):
         st.markdown(f"[{vid['title']}]({vid['url']})")
+        if 'viewCount' in vid and 'subscriberCount' in vid:
+            st.write(
+                f"再生回数: {vid['viewCount']:,}  登録者数: {vid['subscriberCount']:,}"
+            )
         if st.button("この動画で生成", key=vid["videoId"]):
             progress = st.progress(0)
             status = st.empty()
