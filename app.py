@@ -16,6 +16,7 @@ st.title("YouTube ゆっくり解説メーカー")
 # API keys from environment variables
 YT_KEY = os.environ.get("YT_KEY")
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
+GOOGLE_CREDENTIALS = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 if not YT_KEY or not GEMINI_KEY:
     st.info("環境変数 YT_KEY と GEMINI_API_KEY を設定してください。")
@@ -103,17 +104,22 @@ if st.button("検索") and YT_KEY:
             rate = st.slider("読み上げ速度", 0.25, 2.0, 1.0, 0.05)
 
             status.write("ステップ3/3: 音声合成")
-            audio = synthesize_text_to_mp3(
-                script, language_code=out_lang, speaking_rate=rate
-            )
-            progress.progress(3 / total_steps)
-            status.write("ステップ3/3: 音声合成完了！")
+            if GOOGLE_CREDENTIALS:
+                audio = synthesize_text_to_mp3(
+                    script, language_code=out_lang, speaking_rate=rate
+                )
+                progress.progress(3 / total_steps)
+                status.write("ステップ3/3: 音声合成完了！")
 
-            st.audio(audio, format="audio/mp3")
-            st.download_button(
-                "MP3を保存",
-                data=audio,
-                file_name=f"{vid['videoId']}.mp3",
-                mime="audio/mpeg",
-            )
+                st.audio(audio, format="audio/mp3")
+                st.download_button(
+                    "MP3を保存",
+                    data=audio,
+                    file_name=f"{vid['videoId']}.mp3",
+                    mime="audio/mpeg",
+                )
+            else:
+                st.warning(
+                    "GOOGLE_APPLICATION_CREDENTIALS 環境変数が設定されていません"
+                )
             break
