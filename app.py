@@ -1,4 +1,5 @@
 import streamlit as st
+from typing import Optional
 from pipeline import (
     search_videos,
     download_and_transcribe,
@@ -21,12 +22,19 @@ lang = st.selectbox("言語", ["ja", "en", "es"])
 
 published_after = st.text_input("公開日以降 (YYYY-MM-DD)", "2022-01-01")
 published_before = st.text_input("公開日以前 (YYYY-MM-DD)")
-min_views = st.number_input("最小再生回数", min_value=0, value=0)
-max_views = st.number_input("最大再生回数", min_value=0, value=0)
-min_subs = st.number_input("最小チャンネル登録者数", min_value=0, value=0)
-max_subs = st.number_input("最大チャンネル登録者数", min_value=0, value=0)
-min_length = st.number_input("最短動画長(秒)", min_value=0, value=0)
-max_length = st.number_input("最長動画長(秒)", min_value=0, value=0)
+
+
+def parse_int(text: str) -> Optional[int]:
+    text = text.strip()
+    return int(text) if text else None
+
+
+min_views = st.text_input("最小再生回数")
+max_views = st.text_input("最大再生回数")
+min_subs = st.text_input("最小チャンネル登録者数")
+max_subs = st.text_input("最大チャンネル登録者数")
+min_length = st.text_input("最短動画長(秒)")
+max_length = st.text_input("最長動画長(秒)")
 length = st.selectbox("動画の長さ", ["any", "short", "medium", "long"])
 
 if st.button("検索") and YT_KEY:
@@ -39,12 +47,12 @@ if st.button("検索") and YT_KEY:
             video_duration=length,
             published_after=f"{published_after}T00:00:00Z" if published_after else None,
             published_before=f"{published_before}T00:00:00Z" if published_before else None,
-            min_view_count=int(min_views),
-            max_view_count=int(max_views) if max_views else None,
-            min_subscribers=int(min_subs),
-            max_subscribers=int(max_subs) if max_subs else None,
-            min_duration=int(min_length),
-            max_duration=int(max_length) if max_length else None,
+            min_view_count=parse_int(min_views),
+            max_view_count=parse_int(max_views),
+            min_subscribers=parse_int(min_subs),
+            max_subscribers=parse_int(max_subs),
+            min_duration=parse_int(min_length),
+            max_duration=parse_int(max_length),
         )
 
     for idx, vid in enumerate(results, 1):

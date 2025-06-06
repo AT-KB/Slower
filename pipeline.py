@@ -33,11 +33,11 @@ def search_videos(
     video_duration: str = "any",
     published_after: Optional[str] = None,
     published_before: Optional[str] = None,
-    min_view_count: int = 0,
+    min_view_count: Optional[int] = None,
     max_view_count: Optional[int] = None,
-    min_subscribers: int = 0,
+    min_subscribers: Optional[int] = None,
     max_subscribers: Optional[int] = None,
-    min_duration: int = 0,
+    min_duration: Optional[int] = None,
     max_duration: Optional[int] = None,
 ) -> List[dict]:
     """Search YouTube videos and return list of results filtered by criteria."""
@@ -91,15 +91,15 @@ def search_videos(
         subs = channel_stats.get(channel_id, 0)
         duration = _iso_duration_to_seconds(item["contentDetails"]["duration"])
 
-        if views < min_view_count:
+        if min_view_count is not None and views < min_view_count:
             continue
         if max_view_count is not None and views > max_view_count:
             continue
-        if subs < min_subscribers:
+        if min_subscribers is not None and subs < min_subscribers:
             continue
         if max_subscribers is not None and subs > max_subscribers:
             continue
-        if duration < min_duration:
+        if min_duration is not None and duration < min_duration:
             continue
         if max_duration is not None and duration > max_duration:
             continue
