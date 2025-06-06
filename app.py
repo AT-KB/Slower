@@ -8,6 +8,8 @@ from pipeline import (
     synthesize_text_to_mp3,
 )
 import os
+import calendar
+from datetime import date
 
 st.title("YouTube ゆっくり解説メーカー")
 
@@ -22,11 +24,21 @@ keyword = st.text_input("キーワードを入力")
 lang = st.selectbox("言語", ["ja", "en", "es"])
 
 # 公開日の範囲
+current_year = date.today().year
+years = list(range(2010, current_year + 1))
+months = list(range(1, 13))
+
 col1, col2 = st.columns(2)
 with col1:
-    published_after = st.text_input("公開日以降 (YYYY-MM-DD)", "2022-01-01")
+    after_year = st.selectbox("公開年以降", years, index=years.index(2022) if 2022 in years else 0)
+    after_month = st.selectbox("公開月以降", months, index=0)
 with col2:
-    published_before = st.text_input("公開日以前 (YYYY-MM-DD)")
+    before_year = st.selectbox("公開年以前", years, index=len(years) - 1)
+    before_month = st.selectbox("公開月以前", months, index=date.today().month - 1)
+
+published_after = f"{after_year}-{after_month:02d}-01"
+end_day = calendar.monthrange(before_year, before_month)[1]
+published_before = f"{before_year}-{before_month:02d}-{end_day:02d}"
 
 
 # 再生回数の範囲
