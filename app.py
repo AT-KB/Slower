@@ -43,20 +43,22 @@ published_before = f"{before_year}-{before_month:02d}-{end_day:02d}"
 
 
 # 再生回数の範囲
-views = st.slider("再生回数の範囲", 1000, 3000000, (0, 0), step=1000)
+views = st.slider("再生回数の範囲", 10_000, 3_000_000, (10_000, 3_000_000), step=10_000)
 min_views, max_views = views
 
 
 # チャンネル登録者数の範囲
-subs = st.slider("チャンネル登録者数の範囲", 1000, 3000000, (0, 0), step=1000)
+subs = st.slider("チャンネル登録者数の範囲", 10_000, 3_000_000, (10_000, 3_000_000), step=10_000)
 min_subs, max_subs = subs
 
 
-# 動画長(秒)の範囲
-video_len = st.slider("動画長(秒)の範囲", 0, 10_000, (0, 0), step=10)
-min_length, max_length = video_len
+# 動画長(分)の範囲
+video_len_min = st.slider("動画長(分)の範囲", 10, 120, (10, 120), step=5)
+min_length = video_len_min[0] * 60
+max_length = video_len_min[1] * 60
 
 length = st.selectbox("動画の長さ", ["any", "short", "medium", "long"])
+max_results = st.selectbox("出力件数", [10, 25, 40])
 
 if st.button("検索") and YT_KEY:
     with st.spinner("検索中..."):
@@ -64,7 +66,7 @@ if st.button("検索") and YT_KEY:
             YT_KEY,
             keyword,
             lang,
-            max_results=20,
+            max_results=max_results,
             video_duration=length,
             published_after=f"{published_after}T00:00:00Z" if published_after else None,
             published_before=f"{published_before}T00:00:00Z" if published_before else None,
