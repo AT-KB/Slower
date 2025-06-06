@@ -19,14 +19,34 @@ if not YT_KEY or not GEMINI_KEY:
 keyword = st.text_input("キーワードを入力")
 lang = st.selectbox("言語", ["ja", "en", "es"])
 
-published_after = st.text_input("公開日以降 (YYYY-MM-DD)", "2022-01-01")
-published_before = st.text_input("公開日以前 (YYYY-MM-DD)")
-min_views = st.number_input("最小再生回数", min_value=0, value=0)
-max_views = st.number_input("最大再生回数", min_value=0, value=0)
-min_subs = st.number_input("最小チャンネル登録者数", min_value=0, value=0)
-max_subs = st.number_input("最大チャンネル登録者数", min_value=0, value=0)
-min_length = st.number_input("最短動画長(秒)", min_value=0, value=0)
-max_length = st.number_input("最長動画長(秒)", min_value=0, value=0)
+# 公開日の範囲
+col1, col2 = st.columns(2)
+with col1:
+    published_after = st.text_input("公開日以降 (YYYY-MM-DD)", "2022-01-01")
+with col2:
+    published_before = st.text_input("公開日以前 (YYYY-MM-DD)")
+
+# 再生回数の最小値・最大値
+col1, col2 = st.columns(2)
+with col1:
+    min_views = st.number_input("最小再生回数", min_value=0, value=0)
+with col2:
+    max_views = st.number_input("最大再生回数", min_value=0, value=0)
+
+# チャンネル登録者数の最小値・最大値
+col1, col2 = st.columns(2)
+with col1:
+    min_subs = st.number_input("最小チャンネル登録者数", min_value=0, value=0)
+with col2:
+    max_subs = st.number_input("最大チャンネル登録者数", min_value=0, value=0)
+
+# 動画長の最小値・最大値
+col1, col2 = st.columns(2)
+with col1:
+    min_length = st.number_input("最短動画長(秒)", min_value=0, value=0)
+with col2:
+    max_length = st.number_input("最長動画長(秒)", min_value=0, value=0)
+
 length = st.selectbox("動画の長さ", ["any", "short", "medium", "long"])
 
 if st.button("検索") and YT_KEY:
