@@ -38,7 +38,7 @@ def search_videos(api_key: str, keyword: str, lang: str, *, max_results: int = 5
 
 
 def download_and_transcribe(video_id: str, *, out_dir: str = "downloads",
-                            whisper_model: str = "base") -> str:
+                             whisper_model: str = "base") -> str:
     """Download audio from YouTube and transcribe with Whisper."""
     os.makedirs(out_dir, exist_ok=True)
     ydl_opts = {"outtmpl": os.path.join(out_dir, f"{video_id}.%(ext)s"), "format": "bestaudio/best"}
