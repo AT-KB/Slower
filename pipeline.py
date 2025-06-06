@@ -1,3 +1,5 @@
+"""Utility functions to search YouTube, transcribe videos, summarize, and synthesize audio."""
+
 import os
 from typing import List, Optional, Dict
 import re

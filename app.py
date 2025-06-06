@@ -1,3 +1,5 @@
+"""Streamlit app that searches YouTube and generates narrated summaries."""
+
 import streamlit as st
 from pipeline import (
     search_videos,
