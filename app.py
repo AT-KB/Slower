@@ -26,26 +26,20 @@ with col1:
 with col2:
     published_before = st.text_input("公開日以前 (YYYY-MM-DD)")
 
-# 再生回数の最小値・最大値
-col1, col2 = st.columns(2)
-with col1:
-    min_views = st.number_input("最小再生回数", min_value=0, value=0)
-with col2:
-    max_views = st.number_input("最大再生回数", min_value=0, value=0)
 
-# チャンネル登録者数の最小値・最大値
-col1, col2 = st.columns(2)
-with col1:
-    min_subs = st.number_input("最小チャンネル登録者数", min_value=0, value=0)
-with col2:
-    max_subs = st.number_input("最大チャンネル登録者数", min_value=0, value=0)
+# 再生回数の範囲
+views = st.slider("再生回数の範囲", 0, 10_000_000, (0, 0), step=1000)
+min_views, max_views = views
 
-# 動画長の最小値・最大値
-col1, col2 = st.columns(2)
-with col1:
-    min_length = st.number_input("最短動画長(秒)", min_value=0, value=0)
-with col2:
-    max_length = st.number_input("最長動画長(秒)", min_value=0, value=0)
+
+# チャンネル登録者数の範囲
+subs = st.slider("チャンネル登録者数の範囲", 0, 10_000_000, (0, 0), step=1000)
+min_subs, max_subs = subs
+
+
+# 動画長(秒)の範囲
+video_len = st.slider("動画長(秒)の範囲", 0, 10_000, (0, 0), step=10)
+min_length, max_length = video_len
 
 length = st.selectbox("動画の長さ", ["any", "short", "medium", "long"])
 
