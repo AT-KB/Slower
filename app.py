@@ -25,7 +25,7 @@ lang = st.selectbox("言語", ["ja", "en", "es"])
 
 # 公開日の範囲
 current_year = date.today().year
-years = list(range(2010, current_year + 1))
+years = list(range(2015, current_year + 1))
 months = list(range(1, 13))
 
 col1, col2 = st.columns(2)
@@ -42,12 +42,12 @@ published_before = f"{before_year}-{before_month:02d}-{end_day:02d}"
 
 
 # 再生回数の範囲
-views = st.slider("再生回数の範囲", 0, 10_000_000, (0, 0), step=1000)
+views = st.slider("再生回数の範囲", 1000, 3000000, (0, 0), step=1000)
 min_views, max_views = views
 
 
 # チャンネル登録者数の範囲
-subs = st.slider("チャンネル登録者数の範囲", 0, 10_000_000, (0, 0), step=1000)
+subs = st.slider("チャンネル登録者数の範囲", 1000, 3000000, (0, 0), step=1000)
 min_subs, max_subs = subs
 
 
