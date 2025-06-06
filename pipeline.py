@@ -87,10 +87,11 @@ def search_videos(
         "part": "snippet",
         "q": keyword,
         "type": "video",
-        "relevanceLanguage": lang,
         "videoLicense": "creativeCommon",
         "maxResults": 50,
     }
+    if lang != "any":
+        search_params["relevanceLanguage"] = lang
     if video_duration:
         search_params["videoDuration"] = video_duration
     if published_after:

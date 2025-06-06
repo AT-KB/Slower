@@ -25,7 +25,7 @@ if not YT_KEY or not GEMINI_KEY:
 
 keyword = st.text_input("キーワードを入力")
 video_url = st.text_input("動画URL（任意）")
-lang = st.selectbox("言語", ["ja", "en", "es"])
+lang = st.selectbox("言語", ["any", "ja", "en", "es"])
 
 # 公開日の範囲
 current_year = date.today().year
@@ -46,19 +46,27 @@ published_before = f"{before_year}-{before_month:02d}-{end_day:02d}"
 
 
 # 再生回数の範囲
-views = st.slider("再生回数の範囲", 10_000, 3_000_000, (10_000, 3_000_000), step=10_000)
-min_views, max_views = views
-
+col1, col2 = st.columns(2)
+with col1:
+    min_views = st.number_input("最小再生回数", value=10_000, step=1_000)
+with col2:
+    max_views = st.number_input("最大再生回数", value=3_000_000, step=1_000)
 
 # チャンネル登録者数の範囲
-subs = st.slider("チャンネル登録者数の範囲", 10_000, 3_000_000, (10_000, 3_000_000), step=10_000)
-min_subs, max_subs = subs
-
+col3, col4 = st.columns(2)
+with col3:
+    min_subs = st.number_input("最小チャンネル登録者数", value=10_000, step=1_000)
+with col4:
+    max_subs = st.number_input("最大チャンネル登録者数", value=3_000_000, step=1_000)
 
 # 動画長(分)の範囲
-video_len_min = st.slider("動画長(分)の範囲", 10, 120, (10, 120), step=5)
-min_length = video_len_min[0] * 60
-max_length = video_len_min[1] * 60
+col5, col6 = st.columns(2)
+with col5:
+    min_length_min = st.number_input("最小動画長(分)", value=10, step=5)
+with col6:
+    max_length_min = st.number_input("最大動画長(分)", value=120, step=5)
+min_length = min_length_min * 60
+max_length = max_length_min * 60
 
 length = st.selectbox("動画の長さ", ["any", "short", "medium", "long"])
 max_results = st.selectbox("出力件数", [10, 25, 40])
