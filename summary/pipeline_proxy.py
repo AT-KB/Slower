@@ -23,8 +23,8 @@ def download_and_transcribe(*args, **kwargs):
     return _get_pipeline().download_and_transcribe(*args, **kwargs)
 
 
-def summarize_with_gemini(*args, **kwargs):
-    return _get_pipeline().summarize_with_gemini(*args, **kwargs)
+def summarize_with_gemini(api_key, text, *, lang="ja"):
+    return _get_pipeline().summarize_with_gemini(api_key, text, lang=lang)
 
 
 def synthesize_text_to_mp3(*args, **kwargs):
