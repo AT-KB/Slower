@@ -5,6 +5,9 @@
 </head>
 <body>
     <h1>Processed {{ video_id }}</h1>
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
     {% if script %}
     <h2>Script</h2>
     <pre>{{ script }}</pre>
