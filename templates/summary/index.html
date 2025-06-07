@@ -7,7 +7,58 @@
     <h1>YouTube Search</h1>
     <form method="get">
         <input type="text" name="keyword" placeholder="Keyword" value="{{ keyword }}">
-        <input type="text" name="video_url" placeholder="Video URL" value="{{ video_url }}">
+        <input type="text" name="video_url" placeholder="Video URL" value="{{ video_url }}"><br>
+
+        <label>Language:
+            <select name="lang">
+                <option value="any" {% if lang == 'any' %}selected{% endif %}>any</option>
+                <option value="ja" {% if lang == 'ja' %}selected{% endif %}>ja</option>
+                <option value="en" {% if lang == 'en' %}selected{% endif %}>en</option>
+                <option value="es" {% if lang == 'es' %}selected{% endif %}>es</option>
+            </select>
+        </label><br>
+
+        <label>Published After:
+            <input type="date" name="after" value="{{ after }}">
+        </label>
+        <label>Published Before:
+            <input type="date" name="before" value="{{ before }}">
+        </label><br>
+
+        <label>Min Views:
+            <input type="number" name="min_views" value="{{ min_views }}">
+        </label>
+        <label>Max Views:
+            <input type="number" name="max_views" value="{{ max_views }}">
+        </label><br>
+
+        <label>Min Subscribers:
+            <input type="number" name="min_subs" value="{{ min_subs }}">
+        </label>
+        <label>Max Subscribers:
+            <input type="number" name="max_subs" value="{{ max_subs }}">
+        </label><br>
+
+        <label>Min Length (min):
+            <input type="number" name="min_length" value="{{ min_length }}">
+        </label>
+        <label>Max Length (min):
+            <input type="number" name="max_length" value="{{ max_length }}">
+        </label><br>
+
+        <label>Length:
+            <select name="length">
+                <option value="any" {% if length == 'any' %}selected{% endif %}>any</option>
+                <option value="short" {% if length == 'short' %}selected{% endif %}>short</option>
+                <option value="medium" {% if length == 'medium' %}selected{% endif %}>medium</option>
+                <option value="long" {% if length == 'long' %}selected{% endif %}>long</option>
+            </select>
+        </label><br>
+
+        <label>Max Results:
+            <input type="number" name="max_results" value="{{ max_results }}">
+        </label><br>
+
         <button type="submit" name="search">Search</button>
     </form>
     {% if results %}
