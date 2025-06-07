@@ -34,11 +34,15 @@ months = list(range(1, 13))
 
 col1, col2 = st.columns(2)
 with col1:
-    after_year = st.selectbox("公開年以降", years, index=years.index(2022) if 2022 in years else 0)
+    after_year = st.selectbox(
+        "公開年以降", years, index=years.index(2022) if 2022 in years else 0
+    )
     after_month = st.selectbox("公開月以降", months, index=0)
 with col2:
     before_year = st.selectbox("公開年以前", years, index=len(years) - 1)
-    before_month = st.selectbox("公開月以前", months, index=date.today().month - 1)
+    before_month = st.selectbox(
+        "公開月以前", months, index=date.today().month - 1
+    )
 
 published_after = f"{after_year}-{after_month:02d}-01"
 end_day = calendar.monthrange(before_year, before_month)[1]
@@ -55,9 +59,13 @@ with col2:
 # チャンネル登録者数の範囲
 col3, col4 = st.columns(2)
 with col3:
-    min_subs = st.number_input("最小チャンネル登録者数", value=10_000, step=1_000)
+    min_subs = st.number_input(
+        "最小チャンネル登録者数", value=10_000, step=1_000
+    )
 with col4:
-    max_subs = st.number_input("最大チャンネル登録者数", value=3_000_000, step=1_000)
+    max_subs = st.number_input(
+        "最大チャンネル登録者数", value=3_000_000, step=1_000
+    )
 
 # 動画長(分)の範囲
 col5, col6 = st.columns(2)
@@ -92,8 +100,14 @@ if st.button("検索") and YT_KEY:
                 lang,
                 max_results=max_results,
                 video_duration=length,
-                published_after=f"{published_after}T00:00:00Z" if published_after else None,
-                published_before=f"{published_before}T00:00:00Z" if published_before else None,
+                published_after=(
+                    f"{published_after}T00:00:00Z" if published_after else None
+                ),
+                published_before=(
+                    f"{published_before}T00:00:00Z"
+                    if published_before
+                    else None
+                ),
                 min_view_count=int(min_views),
                 max_view_count=int(max_views) if max_views else None,
                 min_subscribers=int(min_subs),
@@ -104,7 +118,7 @@ if st.button("検索") and YT_KEY:
 
     for idx, vid in enumerate(results, 1):
         st.markdown(f"[{vid['title']}]({vid['url']})")
-        if 'viewCount' in vid and 'subscriberCount' in vid:
+        if "viewCount" in vid and "subscriberCount" in vid:
             st.write(
                 f"再生回数: {vid['viewCount']:,}  登録者数: {vid['subscriberCount']:,}"
             )

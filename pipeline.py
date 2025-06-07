@@ -1,4 +1,5 @@
-"""Utility functions to search YouTube, transcribe videos, summarize, and synthesize audio."""
+"""Utility helpers for YouTube search, transcription, summarization,
+and audio synthesis."""
 
 import os
 from typing import List, Optional, Dict
@@ -62,7 +63,12 @@ def get_video_info(api_key: str, video_id: str) -> Optional[dict]:
     if not items:
         return None
     title = items[0]["snippet"].get("title", "")
-    return {"videoId": video_id, "title": title, "url": f"https://youtu.be/{video_id}"}
+    return {
+        "videoId": video_id,
+        "title": title,
+        "url": f"https://youtu.be/{video_id}",
+    }
+
 
 def search_videos(
     api_key: str,
@@ -109,18 +115,28 @@ def search_videos(
     if not video_ids:
         return []
 
-    details = youtube.videos().list(
-        part="contentDetails,statistics,snippet",
-        id=",".join(video_ids),
-    ).execute()
+    details = (
+        youtube.videos()
+        .list(
+            part="contentDetails,statistics,snippet",
+            id=",".join(video_ids),
+        )
+        .execute()
+    )
 
-    channel_ids = list({item["snippet"]["channelId"] for item in details.get("items", [])})
+    channel_ids = list(
+        {item["snippet"]["channelId"] for item in details.get("items", [])}
+    )
     channel_stats: Dict[str, int] = {}
     for i in range(0, len(channel_ids), 50):
-        ch_resp = youtube.channels().list(
-            part="statistics",
-            id=",".join(channel_ids[i : i + 50]),
-        ).execute()
+        ch_resp = (
+            youtube.channels()
+            .list(
+                part="statistics",
+                id=",".join(channel_ids[i : i + 50]),  # noqa: E203
+            )
+            .execute()
+        )
         for ch in ch_resp.get("items", []):
             count = int(ch["statistics"].get("subscriberCount", 0))
             channel_stats[ch["id"]] = count
@@ -164,11 +180,15 @@ def search_videos(
     return results
 
 
-def download_and_transcribe(video_id: str, *, out_dir: str = "downloads",
-                             whisper_model: str = "base") -> str:
+def download_and_transcribe(
+    video_id: str, *, out_dir: str = "downloads", whisper_model: str = "base"
+) -> str:
     """Download audio from YouTube and transcribe with Whisper."""
     os.makedirs(out_dir, exist_ok=True)
-    ydl_opts = {"outtmpl": os.path.join(out_dir, f"{video_id}.%(ext)s"), "format": "bestaudio/best"}
+    ydl_opts = {
+        "outtmpl": os.path.join(out_dir, f"{video_id}.%(ext)s"),
+        "format": "bestaudio/best",
+    }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(f"https://youtu.be/{video_id}", download=True)
         file_path = ydl.prepare_filename(info)
@@ -212,6 +232,10 @@ def synthesize_text_to_mp3(
         speaking_rate=speaking_rate,
     )
     response = client.synthesize_speech(
-        request={"input": synthesis_input, "voice": voice_params, "audio_config": audio_config}
+        request={
+            "input": synthesis_input,
+            "voice": voice_params,
+            "audio_config": audio_config,
+        }
     )
     return response.audio_content
