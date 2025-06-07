@@ -140,7 +140,8 @@ if st.button("検索") and YT_KEY:
                 status.write("完了")
                 break
 
-            script = summarize_with_gemini(GEMINI_KEY, transcript)
+            script_lang = st.selectbox("スクリプト言語", ["ja", "en", "es"])
+            script = summarize_with_gemini(GEMINI_KEY, transcript, lang=script_lang)
             progress.progress(2 / total_steps)
             st.text_area("生成されたスクリプト", script)
 
