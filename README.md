@@ -45,6 +45,15 @@ GOOGLE_APPLICATION_CREDENTIALS=ここを上書きしてください
 7. 取得した文字起こしを Gemini に渡し、ゆっくり解説用のスクリプトを生成します。
 8. さらにそのスクリプトから、2 人の登場人物による要約ディスカッション台本を Gemini で作成し、画面に表示します。音声合成もこの台本を使用します。
 
+## 検索対象動画のライセンス制限
+デフォルトでは、YouTube 検索は Creative Commons ライセンスの動画だけに限られます。
+`pipeline.search_videos` 関数の `search_params` に `"videoLicense": "creativeCommon"` が
+設定されているためです。
+
+すべての動画を対象にしたい場合は、`pipeline.py` を開いてこの行を削除するか、
+値を `"any"` などに変更してください。変更後にアプリを再起動すれば、より広い範囲から
+検索できます。
+
 ## Railway でのデプロイ
 1. Railway のシェルで依存パッケージをインストールします。
    ```bash
