@@ -7,6 +7,7 @@ from pipeline import (
     get_video_info,
     download_and_transcribe,
     summarize_with_gemini,
+    generate_discussion_script,
     synthesize_text_to_mp3,
 )
 import os
@@ -142,8 +143,10 @@ if st.button("検索") and YT_KEY:
 
             script_lang = st.selectbox("スクリプト言語", ["ja", "en", "es"])
             script = summarize_with_gemini(GEMINI_KEY, transcript, lang=script_lang)
+            discussion = generate_discussion_script(GEMINI_KEY, script, lang=script_lang)
             progress.progress(2 / total_steps)
             st.text_area("生成されたスクリプト", script)
+            st.text_area("2人による要約台本", discussion)
 
             out_lang = st.selectbox("音声言語", ["ja-JP", "en-US", "es-ES"])
             rate = st.slider("読み上げ速度", 0.25, 2.0, 1.0, 0.05)
@@ -151,7 +154,7 @@ if st.button("検索") and YT_KEY:
             status.write("ステップ3/3: 音声合成")
             if GOOGLE_CREDENTIALS:
                 audio = synthesize_text_to_mp3(
-                    script, language_code=out_lang, speaking_rate=rate
+                    discussion, language_code=out_lang, speaking_rate=rate
                 )
                 progress.progress(3 / total_steps)
                 status.write("ステップ3/3: 音声合成完了！")

@@ -207,6 +207,18 @@ def summarize_with_gemini(api_key: str, text: str, *, lang: str = "ja") -> str:
     return response.text
 
 
+def generate_discussion_script(api_key: str, summary: str, *, lang: str = "ja") -> str:
+    """Create a two-person discussion script from summary using Gemini."""
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-pro")
+    prompt = (
+        f"以下の要約をもとに、登場人物AとBが交互に解説する台本を{lang}で書いてください。\n"
+        f"{summary}"
+    )
+    response = model.generate_content(prompt)
+    return response.text
+
+
 def synthesize_text_to_mp3(
     text: str,
     *,
