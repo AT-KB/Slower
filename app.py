@@ -25,7 +25,24 @@ if not YT_KEY or not GEMINI_KEY:
     st.info("環境変数 YT_KEY と GEMINI_API_KEY を設定してください。")
 
 keyword = st.text_input("キーワードを入力")
-video_url = st.text_input("動画URL（任意）")
+
+# store up to 5 manual video URLs in session state
+if "video_urls" not in st.session_state:
+    st.session_state.video_urls = []
+
+video_url = st.text_input("動画URL（任意）", key="video_url_input")
+if st.button("追加"):
+    if video_url:
+        if len(st.session_state.video_urls) < 5:
+            st.session_state.video_urls.append(video_url)
+            st.session_state.video_url_input = ""
+        else:
+            st.warning("URLは最大5件までです")
+
+if st.session_state.video_urls:
+    st.write("追加されたURL:")
+    for idx, url in enumerate(st.session_state.video_urls, 1):
+        st.write(f"{idx}. {url}")
 lang = st.selectbox("言語", ["any", "ja", "en", "es"])
 
 # 公開日の範囲
@@ -82,7 +99,19 @@ max_results = st.selectbox("出力件数", [10, 25, 40])
 
 if st.button("検索") and YT_KEY:
     with st.spinner("検索中..."):
-        if video_url:
+        if st.session_state.video_urls:
+            results = []
+            for url in st.session_state.video_urls:
+                vid_id = extract_video_id(url)
+                if not vid_id:
+                    st.warning("URL から動画IDを取得できませんでした")
+                    continue
+                info = get_video_info(YT_KEY, vid_id)
+                if info:
+                    results.append(info)
+                else:
+                    st.warning("動画情報が見つかりませんでした")
+        elif video_url:
             vid_id = extract_video_id(video_url)
             if not vid_id:
                 st.warning("URL から動画IDを取得できませんでした")
