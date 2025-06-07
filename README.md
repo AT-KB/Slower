@@ -1,6 +1,6 @@
 # YouTube ゆっくり解説メーカー
 
-このプロジェクトは、YouTube 動画を検索して選択し、その内容を文字起こし・要約した後、日本語音声を生成する Web アプリです。Streamlit 版に加えて Django 版も用意しています。初心者の方でも `streamlit run app.py` または `python manage.py runserver` を実行するだけで試せます。
+このプロジェクトは、YouTube 動画を検索して選択し、その内容を文字起こし・要約した後、日本語音声を生成する Django Web アプリです。初心者の方でも `python manage.py runserver` を実行するだけで試せます。
 
 ## 必要なもの
 - YouTube Data API キー (`YT_KEY`)
@@ -36,10 +36,6 @@ GOOGLE_APPLICATION_CREDENTIALS=ここを上書きしてください
    python manage.py migrate
    ```
 3. 環境変数を設定したら、次のコマンドでアプリを起動します。
-   ```bash
-   streamlit run app.py
-   ```
-   または Django 版を起動する場合は以下を実行します。
    ```bash
    python manage.py runserver
    ```
