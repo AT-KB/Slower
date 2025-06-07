@@ -27,7 +27,7 @@ def index(request):
     if "search" in request.GET:
         yt_key = os.environ.get("YT_KEY")
         if not yt_key:
-            error = "YouTube API key is not configured."
+            error = "YouTube API key (YT_KEY) is not configured."
         else:
             if video_url:
                 vid = pipeline_proxy.extract_video_id(video_url)
@@ -35,6 +35,10 @@ def index(request):
                     info = pipeline_proxy.get_video_info(yt_key, vid)
                     if info:
                         results = [info]
+                    else:
+                        error = "Video not found."
+                else:
+                    error = "Invalid video URL or ID."
             elif keyword:
                 results = pipeline_proxy.search_videos(
                     yt_key,
@@ -51,6 +55,8 @@ def index(request):
                     min_duration=int(min_length or 0) * 60,
                     max_duration=int(max_length) * 60 if max_length else None,
                 )
+                if not results:
+                    error = "No videos matched the search criteria."
     context = {
         "results": results,
         "keyword": keyword,
@@ -79,6 +85,13 @@ def process_video(request, video_id):
     script_lang = request.GET.get("lang", "ja")
     audio_lang = request.GET.get("audio", "ja-JP")
     gemini_key = os.environ.get("GEMINI_API_KEY")
+    credentials = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    errors = []
+    if not gemini_key:
+        errors.append("Gemini API key (GEMINI_API_KEY) is not configured.")
+    if not credentials:
+        errors.append("Google Cloud credentials are not configured.")
+
     script = (
         pipeline_proxy.summarize_with_gemini(gemini_key, transcript, lang=script_lang)
         if gemini_key
@@ -89,13 +102,20 @@ def process_video(request, video_id):
         if gemini_key
         else script
     )
+
     audio_b64 = None
-    if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+    if credentials:
         audio = pipeline_proxy.synthesize_text_to_mp3(
             script, language_code=audio_lang
         )
         audio_b64 = base64.b64encode(audio).decode("utf-8")
-    context = {"video_id": video_id, "script": script, "audio_b64": audio_b64}
+
+    context = {
+        "video_id": video_id,
+        "script": script,
+        "audio_b64": audio_b64,
+        "error": " ".join(errors) if errors else None,
+    }
     return render(request, "summary/process.html", context)
 
 
@@ -111,6 +131,13 @@ def process_multiple(request):
     combined = "\n".join(transcripts)
 
     gemini_key = os.environ.get("GEMINI_API_KEY")
+    credentials = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    errors = []
+    if not gemini_key:
+        errors.append("Gemini API key (GEMINI_API_KEY) is not configured.")
+    if not credentials:
+        errors.append("Google Cloud credentials are not configured.")
+
     script = (
         pipeline_proxy.summarize_with_gemini(gemini_key, combined, lang=script_lang)
         if gemini_key
@@ -123,11 +150,16 @@ def process_multiple(request):
     )
 
     audio_b64 = None
-    if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+    if credentials:
         audio = pipeline_proxy.synthesize_text_to_mp3(
             script, language_code=audio_lang
         )
         audio_b64 = base64.b64encode(audio).decode("utf-8")
 
-    context = {"video_ids": video_ids, "script": script, "audio_b64": audio_b64}
+    context = {
+        "video_ids": video_ids,
+        "script": script,
+        "audio_b64": audio_b64,
+        "error": " ".join(errors) if errors else None,
+    }
     return render(request, "summary/multi_process.html", context)
