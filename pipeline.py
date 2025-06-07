@@ -194,7 +194,13 @@ def download_and_transcribe(
         file_path = ydl.prepare_filename(info)
 
     model = whisper.load_model(whisper_model)
-    result = model.transcribe(file_path)
+    try:
+        result = model.transcribe(file_path)
+    finally:
+        try:
+            os.remove(file_path)
+        except OSError:
+            pass
     return result["text"]
 
 
