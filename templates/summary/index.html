@@ -5,6 +5,9 @@
 </head>
 <body>
     <h1>YouTube Search</h1>
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
     <form method="get">
         <input type="text" name="keyword" placeholder="Keyword" value="{{ keyword }}">
         <input type="text" name="video_url" placeholder="Video URL" value="{{ video_url }}"><br>

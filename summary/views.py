@@ -23,9 +23,12 @@ def index(request):
     max_results = request.GET.get("max_results", "5")
 
     results = []
+    error = None
     if "search" in request.GET:
         yt_key = os.environ.get("YT_KEY")
-        if yt_key:
+        if not yt_key:
+            error = "YouTube API key is not configured."
+        else:
             if video_url:
                 vid = pipeline_proxy.extract_video_id(video_url)
                 if vid:
@@ -65,6 +68,7 @@ def index(request):
         "max_length": max_length,
         "length": length,
         "max_results": max_results,
+        "error": error,
     }
     return render(request, "summary/index.html", context)
 
