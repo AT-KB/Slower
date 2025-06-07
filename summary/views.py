@@ -10,6 +10,7 @@ def index(request):
     video_url = request.GET.get("video_url", "")
     lang = request.GET.get("lang", "any")
     script_lang = request.GET.get("script_lang", "ja")
+    audio_lang = request.GET.get("audio_lang", "ja-JP")
     after = request.GET.get("after", "")
     before = request.GET.get("before", "")
     min_views = request.GET.get("min_views", "")
@@ -53,6 +54,7 @@ def index(request):
         "video_url": video_url,
         "lang": lang,
         "script_lang": script_lang,
+        "audio_lang": audio_lang,
         "after": after,
         "before": before,
         "min_views": min_views,
@@ -71,6 +73,7 @@ def process_video(request, video_id):
     """Run pipeline on selected video."""
     transcript = pipeline_proxy.download_and_transcribe(video_id)
     script_lang = request.GET.get("lang", "ja")
+    audio_lang = request.GET.get("audio", "ja-JP")
     gemini_key = os.environ.get("GEMINI_API_KEY")
     script = (
         pipeline_proxy.summarize_with_gemini(gemini_key, transcript, lang=script_lang)
@@ -84,7 +87,9 @@ def process_video(request, video_id):
     )
     audio_b64 = None
     if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
-        audio = pipeline_proxy.synthesize_text_to_mp3(script)
+        audio = pipeline_proxy.synthesize_text_to_mp3(
+            script, language_code=audio_lang
+        )
         audio_b64 = base64.b64encode(audio).decode("utf-8")
     context = {"video_id": video_id, "script": script, "audio_b64": audio_b64}
     return render(request, "summary/process.html", context)
