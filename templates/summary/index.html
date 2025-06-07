@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube Search</title>
+</head>
+<body>
+    <h1>YouTube Search</h1>
+    <form method="get">
+        <input type="text" name="keyword" placeholder="Keyword" value="{{ keyword }}">
+        <input type="text" name="video_url" placeholder="Video URL" value="{{ video_url }}">
+        <button type="submit" name="search">Search</button>
+    </form>
+    {% if results %}
+    <ul>
+        {% for vid in results %}
+        <li>
+            <a href="{{ vid.url }}" target="_blank">{{ vid.title }}</a>
+            [<a href="{% url 'process_video' vid.videoId %}">Process</a>]
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</body>
+</html>

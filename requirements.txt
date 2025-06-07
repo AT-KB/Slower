@@ -4,3 +4,4 @@ google-api-python-client
 google-cloud-texttospeech
 google-generativeai
 openai-whisper
+Django>=5.2.2
