@@ -45,6 +45,11 @@
    python manage.py collectstatic --noinput
    ```
 3. `.env.example` を参考に環境変数を Railway の設定画面で追加します。
+4. Docker を利用する場合は次のコマンドでイメージをビルドして実行できます。
+   ```bash
+   docker build -t slower .
+   docker run -p 8000:8000 slower
+   ```
 
 ## ライセンス
 このプロジェクトは MIT ライセンスの下で公開されています。詳細は LICENSE ファイルを参照してください。
