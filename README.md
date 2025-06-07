@@ -11,6 +11,20 @@
 
 これらの情報は環境変数として設定してください。
 
+## 環境変数の設定
+`.env.example` を `.env` にコピーして、以下の値を編集します。
+
+```bash
+cp .env.example .env
+# .env の例 (ここを上書きしてください)
+SECRET_KEY=ここを上書きしてください
+DEBUG=True
+DATABASE_URL=
+YT_KEY=ここを上書きしてください
+GEMINI_API_KEY=ここを上書きしてください
+GOOGLE_APPLICATION_CREDENTIALS=ここを上書きしてください
+```
+
 ## セットアップ
 1. 依存パッケージをインストールします。
    ```bash
