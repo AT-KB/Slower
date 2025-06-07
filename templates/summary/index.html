@@ -76,14 +76,21 @@
         <button type="submit" name="search">Search</button>
     </form>
     {% if results %}
-    <ul>
-        {% for vid in results %}
-        <li>
-            <a href="{{ vid.url }}" target="_blank">{{ vid.title }}</a>
-            [<a href="{% url 'process_video' vid.videoId %}?lang={{ script_lang }}&audio={{ audio_lang }}">Process</a>]
-        </li>
-        {% endfor %}
-    </ul>
+    <form method="post" action="{% url 'process_multiple' %}">
+        {% csrf_token %}
+        <input type="hidden" name="script_lang" value="{{ script_lang }}">
+        <input type="hidden" name="audio_lang" value="{{ audio_lang }}">
+        <ul>
+            {% for vid in results %}
+            <li>
+                <input type="checkbox" name="video_ids" value="{{ vid.videoId }}">
+                <a href="{{ vid.url }}" target="_blank">{{ vid.title }}</a>
+                [<a href="{% url 'process_video' vid.videoId %}?lang={{ script_lang }}&audio={{ audio_lang }}">Process</a>]
+            </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Process Selected</button>
+    </form>
     {% endif %}
 </body>
 </html>

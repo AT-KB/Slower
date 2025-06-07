@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Process Multiple Videos</title>
+</head>
+<body>
+    <h1>Processed {{ video_ids|join:", " }}</h1>
+    {% if script %}
+    <h2>Script</h2>
+    <pre>{{ script }}</pre>
+    {% endif %}
+    {% if audio_b64 %}
+    <h2>Audio</h2>
+    <audio controls>
+        <source src="data:audio/mpeg;base64,{{ audio_b64 }}" type="audio/mpeg">
+    </audio>
+    {% endif %}
+    <p><a href="/">Back</a></p>
+</body>
+</html>

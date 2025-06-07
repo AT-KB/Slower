@@ -93,3 +93,37 @@ def process_video(request, video_id):
         audio_b64 = base64.b64encode(audio).decode("utf-8")
     context = {"video_id": video_id, "script": script, "audio_b64": audio_b64}
     return render(request, "summary/process.html", context)
+
+
+def process_multiple(request):
+    """Process multiple videos selected from search results."""
+    video_ids = request.POST.getlist("video_ids")
+    script_lang = request.POST.get("script_lang", "ja")
+    audio_lang = request.POST.get("audio_lang", "ja-JP")
+
+    transcripts = []
+    for vid in video_ids:
+        transcripts.append(pipeline_proxy.download_and_transcribe(vid))
+    combined = "\n".join(transcripts)
+
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    script = (
+        pipeline_proxy.summarize_with_gemini(gemini_key, combined, lang=script_lang)
+        if gemini_key
+        else combined
+    )
+    script = (
+        pipeline_proxy.generate_discussion_script(gemini_key, script, lang=script_lang)
+        if gemini_key
+        else script
+    )
+
+    audio_b64 = None
+    if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+        audio = pipeline_proxy.synthesize_text_to_mp3(
+            script, language_code=audio_lang
+        )
+        audio_b64 = base64.b64encode(audio).decode("utf-8")
+
+    context = {"video_ids": video_ids, "script": script, "audio_b64": audio_b64}
+    return render(request, "summary/multi_process.html", context)

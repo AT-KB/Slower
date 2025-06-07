@@ -55,3 +55,21 @@ class BasicViewTests(TestCase):
             response = Client().get("/process/abc/", params)
         self.assertEqual(response.status_code, 200)
         mock_synth.assert_called_with("hi", language_code="en-US")
+
+    @patch("summary.views.pipeline_proxy.synthesize_text_to_mp3")
+    @patch("summary.views.pipeline_proxy.download_and_transcribe")
+    def test_process_multiple(self, mock_transcribe, mock_synth):
+        mock_transcribe.side_effect = ["one", "two"]
+        mock_synth.return_value = b"mp3"
+        data = {
+            "video_ids": ["a", "b"],
+            "script_lang": "en",
+            "audio_lang": "en-US",
+        }
+        with patch.dict(os.environ, {"GOOGLE_APPLICATION_CREDENTIALS": "1"}):
+            response = Client().post("/process-multi/", data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mock_transcribe.call_count, 2)
+        mock_transcribe.assert_any_call("a")
+        mock_transcribe.assert_any_call("b")
+        mock_synth.assert_called_once()
