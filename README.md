@@ -34,6 +34,18 @@
 6. 取得した文字起こしを Gemini に渡し、ゆっくり解説用のスクリプトを生成します。
 7. さらにそのスクリプトから、2 人の登場人物による要約ディスカッション台本を Gemini で作成し、画面に表示します。音声合成もこの台本を使用します。
 
+## Railway でのデプロイ
+1. Railway のシェルで依存パッケージをインストールします。
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. 次のコマンドを実行してデータベースを準備します。
+   ```bash
+   python manage.py migrate
+   python manage.py collectstatic --noinput
+   ```
+3. `.env.example` を参考に環境変数を Railway の設定画面で追加します。
+
 ## ライセンス
 このプロジェクトは MIT ライセンスの下で公開されています。詳細は LICENSE ファイルを参照してください。
 
