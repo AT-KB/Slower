@@ -198,11 +198,11 @@ def download_and_transcribe(
     return result["text"]
 
 
-def summarize_with_gemini(api_key: str, text: str) -> str:
-    """Summarize transcript in Japanese using Gemini."""
+def summarize_with_gemini(api_key: str, text: str, *, lang: str = "ja") -> str:
+    """Summarize transcript in the specified language using Gemini."""
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-pro")
-    prompt = f"次の内容を日本語でゆっくり解説してください:\n{text}"
+    prompt = f"次の内容を{lang}でゆっくり解説してください:\n{text}"
     response = model.generate_content(prompt)
     return response.text
 

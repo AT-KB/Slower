@@ -9,6 +9,7 @@ def index(request):
     keyword = request.GET.get("keyword", "")
     video_url = request.GET.get("video_url", "")
     lang = request.GET.get("lang", "any")
+    script_lang = request.GET.get("script_lang", "ja")
     after = request.GET.get("after", "")
     before = request.GET.get("before", "")
     min_views = request.GET.get("min_views", "")
@@ -51,6 +52,7 @@ def index(request):
         "keyword": keyword,
         "video_url": video_url,
         "lang": lang,
+        "script_lang": script_lang,
         "after": after,
         "before": before,
         "min_views": min_views,
@@ -68,9 +70,10 @@ def index(request):
 def process_video(request, video_id):
     """Run pipeline on selected video."""
     transcript = pipeline_proxy.download_and_transcribe(video_id)
+    script_lang = request.GET.get("lang", "ja")
     gemini_key = os.environ.get("GEMINI_API_KEY")
     script = (
-        pipeline_proxy.summarize_with_gemini(gemini_key, transcript)
+        pipeline_proxy.summarize_with_gemini(gemini_key, transcript, lang=script_lang)
         if gemini_key
         else transcript
     )

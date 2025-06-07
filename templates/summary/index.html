@@ -17,6 +17,13 @@
                 <option value="es" {% if lang == 'es' %}selected{% endif %}>es</option>
             </select>
         </label><br>
+        <label>Script Language:
+            <select name="script_lang">
+                <option value="ja" {% if script_lang == 'ja' %}selected{% endif %}>ja</option>
+                <option value="en" {% if script_lang == 'en' %}selected{% endif %}>en</option>
+                <option value="es" {% if script_lang == 'es' %}selected{% endif %}>es</option>
+            </select>
+        </label><br>
 
         <label>Published After:
             <input type="date" name="after" value="{{ after }}">
@@ -66,7 +73,7 @@
         {% for vid in results %}
         <li>
             <a href="{{ vid.url }}" target="_blank">{{ vid.title }}</a>
-            [<a href="{% url 'process_video' vid.videoId %}">Process</a>]
+            [<a href="{% url 'process_video' vid.videoId %}?lang={{ script_lang }}">Process</a>]
         </li>
         {% endfor %}
     </ul>
