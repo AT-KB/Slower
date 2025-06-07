@@ -77,6 +77,11 @@ def process_video(request, video_id):
         if gemini_key
         else transcript
     )
+    script = (
+        pipeline_proxy.generate_discussion_script(gemini_key, script, lang=script_lang)
+        if gemini_key
+        else script
+    )
     audio_b64 = None
     if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
         audio = pipeline_proxy.synthesize_text_to_mp3(script)

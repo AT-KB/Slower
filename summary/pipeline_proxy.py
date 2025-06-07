@@ -27,5 +27,9 @@ def summarize_with_gemini(api_key, text, *, lang="ja"):
     return _get_pipeline().summarize_with_gemini(api_key, text, lang=lang)
 
 
+def generate_discussion_script(api_key, summary, *, lang="ja"):
+    return _get_pipeline().generate_discussion_script(api_key, summary, lang=lang)
+
+
 def synthesize_text_to_mp3(*args, **kwargs):
     return _get_pipeline().synthesize_text_to_mp3(*args, **kwargs)
