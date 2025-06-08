@@ -8,6 +8,7 @@
 - 使用する Gemini モデル名 (`GEMINI_MODEL`, デフォルト `models/gemini-pro`)
   - 省略可。別のモデルを使う場合はこの値を変更してください
 - Google Cloud Text-to-Speech の認証情報
+- yt-dlp で利用する cookie ファイル (`YTDLP_COOKIES`, 任意)
 
 環境変数 `GOOGLE_APPLICATION_CREDENTIALS` はサービスアカウント JSON ファイルへのパスを指定してください。
 

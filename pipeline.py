@@ -13,6 +13,10 @@ import whisper
 import google.generativeai as genai
 
 
+# Path to a cookies file for yt-dlp (optional)
+YTDLP_COOKIES = os.getenv("YTDLP_COOKIES")
+
+
 def _iso_duration_to_seconds(duration: str) -> int:
     """Convert ISO 8601 duration to seconds."""
     pattern = re.compile(
@@ -193,9 +197,8 @@ def download_and_transcribe(video_id: str, *, out_dir: str = "downloads") -> str
     }
 
     # Use cookies for age-restricted or authenticated videos
-    cookies_path = os.getenv("YTDLP_COOKIES")
-    if cookies_path and os.path.exists(cookies_path):
-        ydl_opts["cookiefile"] = cookies_path
+    if YTDLP_COOKIES and os.path.exists(YTDLP_COOKIES):
+        ydl_opts["cookiefile"] = YTDLP_COOKIES
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(f"https://youtu.be/{video_id}", download=True)
         file_path = ydl.prepare_filename(info)
