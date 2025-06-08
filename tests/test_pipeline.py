@@ -33,7 +33,20 @@ sys.modules['google.cloud.texttospeech_v1'] = tts
 
 # Other stubs
 sys.modules['yt_dlp'] = types.ModuleType('yt_dlp')
-sys.modules['whisper'] = types.ModuleType('whisper')
+
+# Whisper stub with load_model tracking
+whisper_stub = types.ModuleType('whisper')
+whisper_stub.load_calls = []
+
+class DummyModel:
+    pass
+
+def load_model(name):
+    whisper_stub.load_calls.append(name)
+    return DummyModel()
+
+whisper_stub.load_model = load_model
+sys.modules['whisper'] = whisper_stub
 google_pkg = types.ModuleType('google')
 genai = types.ModuleType('google.generativeai')
 google_pkg.generativeai = genai
@@ -64,3 +77,10 @@ def test_iso_duration_to_seconds():
     assert pipeline._iso_duration_to_seconds('PT1H2M3S') == 3600 + 2 * 60 + 3
     assert pipeline._iso_duration_to_seconds('PT45S') == 45
     assert pipeline._iso_duration_to_seconds('invalid') == 0
+
+
+def test_get_whisper_model_caching():
+    model1 = pipeline._get_whisper_model('base')
+    model2 = pipeline._get_whisper_model('base')
+    assert model1 is model2
+    assert whisper_stub.load_calls == ['base']
