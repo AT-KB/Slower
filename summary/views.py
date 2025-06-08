@@ -32,31 +32,39 @@ def index(request):
             if video_url:
                 vid = pipeline_proxy.extract_video_id(video_url)
                 if vid:
-                    info = pipeline_proxy.get_video_info(yt_key, vid)
-                    if info:
-                        results = [info]
-                    else:
-                        error = "Video not found."
+                    try:
+                        info = pipeline_proxy.get_video_info(yt_key, vid)
+                        if info:
+                            results = [info]
+                        else:
+                            error = "Video not found."
+                    except Exception as e:
+                        results = []
+                        error = str(e)
                 else:
                     error = "Invalid video URL or ID."
             elif keyword:
-                results = pipeline_proxy.search_videos(
-                    yt_key,
-                    keyword,
-                    lang,
-                    max_results=int(max_results or 5),
-                    video_duration=length,
-                    published_after=f"{after}T00:00:00Z" if after else None,
-                    published_before=f"{before}T00:00:00Z" if before else None,
-                    min_view_count=int(min_views or 0),
-                    max_view_count=int(max_views) if max_views else None,
-                    min_subscribers=int(min_subs or 0),
-                    max_subscribers=int(max_subs) if max_subs else None,
-                    min_duration=int(min_length or 0) * 60,
-                    max_duration=int(max_length) * 60 if max_length else None,
-                )
-                if not results:
-                    error = "No videos matched the search criteria."
+                try:
+                    results = pipeline_proxy.search_videos(
+                        yt_key,
+                        keyword,
+                        lang,
+                        max_results=int(max_results or 5),
+                        video_duration=length,
+                        published_after=f"{after}T00:00:00Z" if after else None,
+                        published_before=f"{before}T00:00:00Z" if before else None,
+                        min_view_count=int(min_views or 0),
+                        max_view_count=int(max_views) if max_views else None,
+                        min_subscribers=int(min_subs or 0),
+                        max_subscribers=int(max_subs) if max_subs else None,
+                        min_duration=int(min_length or 0) * 60,
+                        max_duration=int(max_length) * 60 if max_length else None,
+                    )
+                    if not results:
+                        error = "No videos matched the search criteria."
+                except Exception as e:
+                    results = []
+                    error = str(e)
     context = {
         "results": results,
         "keyword": keyword,
