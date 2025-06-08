@@ -26,7 +26,11 @@ YT_KEY=ここを上書きしてください
 GEMINI_API_KEY=ここを上書きしてください
 GEMINI_MODEL=models/gemini-pro
 GOOGLE_APPLICATION_CREDENTIALS=ここを上書きしてください
+YTDLP_COOKIES=
 ```
+
+`YTDLP_COOKIES` には、年齢制限やログインが必要な動画を処理するときに使用する
+cookie ファイルへのパスを指定します。
 
 ## セットアップ
 1. 依存パッケージをインストールします。
