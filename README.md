@@ -27,10 +27,11 @@ GEMINI_API_KEY=ここを上書きしてください
 GEMINI_MODEL=models/gemini-pro
 GOOGLE_APPLICATION_CREDENTIALS=ここを上書きしてください
 YTDLP_COOKIES=
+WHISPER_MODEL=base
 ```
 
-`YTDLP_COOKIES` には、年齢制限やログインが必要な動画を処理するときに使用する
-cookie ファイルへのパスを指定します。
+`YTDLP_COOKIES` には、年齢制限やログインが必要な動画を処理するときに使用する cookie ファイルへのパスを指定します。
+`WHISPER_MODEL` を指定すると Whisper のモデルサイズを変更できます。`tiny` などの小さいモデルを使うとメモリ使用量を抑えられ、ワーカーが kill されるのを防げます.
 
 ## セットアップ
 1. 依存パッケージをインストールします。
