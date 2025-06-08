@@ -1,6 +1,6 @@
 import os
 import base64
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from . import pipeline_proxy
 
 
@@ -208,3 +208,111 @@ def process_multiple(request):
         "steps": "\n".join(steps) if steps else None,
     }
     return render(request, "summary/multi_process.html", context)
+
+
+# New step-by-step endpoints
+def show_process(request, video_id):
+    """Display processing page with current session data."""
+    context = {
+        "video_id": video_id,
+        "script": request.session.get("script"),
+        "audio_b64": request.session.get("audio_b64"),
+        "error": request.session.get("error"),
+        "steps": "\n".join(request.session.get("steps", [])) or None,
+    }
+    return render(request, "summary/process.html", context)
+
+
+def transcribe_step(request, video_id):
+    """Run transcription step."""
+    steps = request.session.get("steps", [])
+    try:
+        transcript = pipeline_proxy.download_and_transcribe(video_id)
+        request.session["transcript"] = transcript
+        steps.append("transcribed")
+        request.session["error"] = ""
+    except Exception as e:
+        request.session["error"] = str(e)
+    request.session["steps"] = steps
+    return redirect("show_process", video_id=video_id)
+
+
+def summarize_step(request, video_id):
+    """Run summarization step."""
+    steps = request.session.get("steps", [])
+    transcript = request.session.get("transcript")
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    if not gemini_key:
+        request.session["error"] = "Gemini API key (GEMINI_API_KEY) is not configured."
+    elif not transcript:
+        request.session["error"] = "No transcript to summarize."
+    else:
+        try:
+            summary = pipeline_proxy.summarize_with_gemini(
+                gemini_key,
+                transcript,
+                lang=request.GET.get("lang", "ja"),
+            )
+            request.session["summary"] = summary
+            steps.append("summarized")
+            request.session["error"] = ""
+        except Exception as e:
+            request.session["error"] = str(e)
+    request.session["steps"] = steps
+    return redirect("show_process", video_id=video_id)
+
+
+def generate_script_step(request, video_id):
+    """Create discussion script from summary."""
+    steps = request.session.get("steps", [])
+    summary = request.session.get("summary")
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    if not gemini_key:
+        request.session["error"] = "Gemini API key (GEMINI_API_KEY) is not configured."
+    elif not summary:
+        request.session["error"] = "No summary to convert into script."
+    else:
+        try:
+            script = pipeline_proxy.generate_discussion_script(
+                gemini_key,
+                summary,
+                lang=request.GET.get("lang", "ja"),
+            )
+            request.session["script"] = script
+            steps.append("script generated")
+            request.session["error"] = ""
+        except Exception as e:
+            request.session["error"] = str(e)
+    request.session["steps"] = steps
+    return redirect("show_process", video_id=video_id)
+
+
+def synthesize_step(request, video_id):
+    """Generate MP3 audio from script."""
+    steps = request.session.get("steps", [])
+    script = request.session.get("script")
+    credentials = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    if not credentials:
+        request.session["error"] = "Google Cloud credentials are not configured."
+    elif not script:
+        request.session["error"] = "No script to synthesize."
+    else:
+        try:
+            audio = pipeline_proxy.synthesize_text_to_mp3(
+                script,
+                language_code=request.GET.get("audio", "ja-JP"),
+            )
+            request.session["audio_b64"] = base64.b64encode(audio).decode("utf-8")
+            steps.append("audio created")
+            request.session["error"] = ""
+        except Exception as e:
+            request.session["error"] = str(e)
+    request.session["steps"] = steps
+    return redirect("show_process", video_id=video_id)
+
+
+def clear_process(request, video_id):
+    """Clear session data for a video."""
+    for key in ["transcript", "summary", "script", "audio_b64", "steps", "error"]:
+        request.session.pop(key, None)
+    return redirect("show_process", video_id=video_id)
