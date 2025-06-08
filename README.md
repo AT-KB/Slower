@@ -40,6 +40,15 @@ GUNICORN_TIMEOUT=120
 `YTDLP_COOKIES` には、年齢制限やログインが必要な動画を処理するときに使用する cookie ファイルへのパスを指定します。
 `WHISPER_MODEL` を指定すると Whisper のモデルサイズを変更できます。デフォルトは `base` ですが、`tiny` などの小さいモデルを使うとメモリ使用量を抑えられ、Gunicorn のタイムアウトを避けられる場合があります。
 `GUNICORN_TIMEOUT` で Gunicorn のタイムアウト秒数を調整できます。Whisper モデルを低スペックのハードウェアで使用する際は、処理に時間がかかるためより長いタイムアウトが必要になることがあります。
+## Performance Tips
+
+CPU 環境ではデフォルトの Whisper モデル `base` の処理に数分かかることがあります。
+`.env` で `WHISPER_MODEL=tiny` または `WHISPER_MODEL=small` を設定すると処理が速くなります。
+必要に応じて `GUNICORN_TIMEOUT` も長めに設定してください。
+```
+WHISPER_MODEL=tiny
+GUNICORN_TIMEOUT=300
+```
 
 ## セットアップ
 1. 依存パッケージをインストールします。
