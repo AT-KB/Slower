@@ -92,9 +92,9 @@ def process_video(request, video_id):
     """Run pipeline on selected video."""
     errors = []
     steps = []
+    steps.append("download")
     try:
         transcript = pipeline_proxy.download_and_transcribe(video_id)
-        steps.append("download")
     except Exception as e:
         transcript = ""
         errors.append(str(e))
@@ -109,30 +109,30 @@ def process_video(request, video_id):
 
     script = transcript
     if gemini_key and transcript:
+        steps.append("summarize")
         try:
             script = pipeline_proxy.summarize_with_gemini(
                 gemini_key, transcript, lang=script_lang
             )
-            steps.append("summarize")
         except Exception as e:
             errors.append(str(e))
     if gemini_key and script:
+        steps.append("script")
         try:
             script = pipeline_proxy.generate_discussion_script(
                 gemini_key, script, lang=script_lang
             )
-            steps.append("discussion generation")
         except Exception as e:
             errors.append(str(e))
 
     audio_b64 = None
     if credentials and script:
+        steps.append("synthesize")
         try:
             audio = pipeline_proxy.synthesize_text_to_mp3(
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
-            steps.append("synthesize")
         except Exception as e:
             errors.append(str(e))
 
@@ -155,11 +155,10 @@ def process_multiple(request):
     transcripts = []
     errors = []
     steps = []
+    steps.append("download")
     for vid in video_ids:
         try:
             transcripts.append(pipeline_proxy.download_and_transcribe(vid))
-            if "download" not in steps:
-                steps.append("download")
         except Exception as e:
             errors.append(str(e))
     combined = "\n".join(transcripts)
@@ -173,30 +172,30 @@ def process_multiple(request):
 
     script = combined
     if gemini_key and combined:
+        steps.append("summarize")
         try:
             script = pipeline_proxy.summarize_with_gemini(
                 gemini_key, combined, lang=script_lang
             )
-            steps.append("summarize")
         except Exception as e:
             errors.append(str(e))
     if gemini_key and script:
+        steps.append("script")
         try:
             script = pipeline_proxy.generate_discussion_script(
                 gemini_key, script, lang=script_lang
             )
-            steps.append("discussion generation")
         except Exception as e:
             errors.append(str(e))
 
     audio_b64 = None
     if credentials and script:
+        steps.append("synthesize")
         try:
             audio = pipeline_proxy.synthesize_text_to_mp3(
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
-            steps.append("synthesize")
         except Exception as e:
             errors.append(str(e))
 
