@@ -9,8 +9,11 @@
   - 省略可。別のモデルを使う場合はこの値を変更してください
 - Google Cloud Text-to-Speech の認証情報
 - yt-dlp で利用する cookie ファイル (`YTDLP_COOKIES`, 任意)
+  - 年齢制限付き動画をダウンロードする際に使用
 - Whisper のモデル名 (`WHISPER_MODEL`, デフォルト `base`)
+  - 文字起こしに使う Whisper モデルを指定
 - Gunicorn のタイムアウト秒数 (`GUNICORN_TIMEOUT`, デフォルト `120`)
+  - デプロイ時の処理時間に合わせて調整
 
 環境変数 `GOOGLE_APPLICATION_CREDENTIALS` はサービスアカウント JSON ファイルへのパスを指定してください。
 
