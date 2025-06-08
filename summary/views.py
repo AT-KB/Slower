@@ -94,7 +94,7 @@ def process_video(request, video_id):
     steps = []
     try:
         transcript = pipeline_proxy.download_and_transcribe(video_id)
-        steps.append("transcription")
+        steps.append("download")
     except Exception as e:
         transcript = ""
         errors.append(str(e))
@@ -113,7 +113,7 @@ def process_video(request, video_id):
             script = pipeline_proxy.summarize_with_gemini(
                 gemini_key, transcript, lang=script_lang
             )
-            steps.append("summarization")
+            steps.append("summarize")
         except Exception as e:
             errors.append(str(e))
     if gemini_key and script:
@@ -121,7 +121,7 @@ def process_video(request, video_id):
             script = pipeline_proxy.generate_discussion_script(
                 gemini_key, script, lang=script_lang
             )
-            steps.append("script generation")
+            steps.append("discussion generation")
         except Exception as e:
             errors.append(str(e))
 
@@ -132,7 +132,7 @@ def process_video(request, video_id):
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
-            steps.append("audio synthesis")
+            steps.append("synthesize")
         except Exception as e:
             errors.append(str(e))
 
@@ -158,8 +158,8 @@ def process_multiple(request):
     for vid in video_ids:
         try:
             transcripts.append(pipeline_proxy.download_and_transcribe(vid))
-            if "transcription" not in steps:
-                steps.append("transcription")
+            if "download" not in steps:
+                steps.append("download")
         except Exception as e:
             errors.append(str(e))
     combined = "\n".join(transcripts)
@@ -177,7 +177,7 @@ def process_multiple(request):
             script = pipeline_proxy.summarize_with_gemini(
                 gemini_key, combined, lang=script_lang
             )
-            steps.append("summarization")
+            steps.append("summarize")
         except Exception as e:
             errors.append(str(e))
     if gemini_key and script:
@@ -185,7 +185,7 @@ def process_multiple(request):
             script = pipeline_proxy.generate_discussion_script(
                 gemini_key, script, lang=script_lang
             )
-            steps.append("script generation")
+            steps.append("discussion generation")
         except Exception as e:
             errors.append(str(e))
 
@@ -196,7 +196,7 @@ def process_multiple(request):
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
-            steps.append("audio synthesis")
+            steps.append("synthesize")
         except Exception as e:
             errors.append(str(e))
 
