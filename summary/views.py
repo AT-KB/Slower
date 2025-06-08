@@ -23,11 +23,11 @@ def index(request):
     max_results = request.GET.get("max_results", "5")
 
     results = []
-    error = None
+    error = ""
     if "search" in request.GET:
         yt_key = os.environ.get("YT_KEY")
         if not yt_key:
-            error = "YouTube API key (YT_KEY) is not configured."
+            error += "YouTube API key (YT_KEY) is not configured."
         else:
             if video_url:
                 vid = pipeline_proxy.extract_video_id(video_url)
@@ -37,12 +37,12 @@ def index(request):
                         if info:
                             results = [info]
                         else:
-                            error = "Video not found."
+                            error += "Video not found."
                     except Exception as e:
                         results = []
-                        error = str(e)
+                        error += str(e)
                 else:
-                    error = "Invalid video URL or ID."
+                    error += "Invalid video URL or ID."
             elif keyword:
                 try:
                     results = pipeline_proxy.search_videos(
@@ -61,10 +61,11 @@ def index(request):
                         max_duration=int(max_length) * 60 if max_length else None,
                     )
                     if not results:
-                        error = "No videos matched the search criteria."
+                        error += "No videos matched the search criteria."
                 except Exception as e:
                     results = []
-                    error = str(e)
+                    error += str(e)
+    error = error.strip()
     context = {
         "results": results,
         "keyword": keyword,
@@ -82,7 +83,7 @@ def index(request):
         "max_length": max_length,
         "length": length,
         "max_results": max_results,
-        "error": error,
+        "error": error if error else None,
     }
     return render(request, "summary/index.html", context)
 
@@ -90,8 +91,10 @@ def index(request):
 def process_video(request, video_id):
     """Run pipeline on selected video."""
     errors = []
+    steps = []
     try:
         transcript = pipeline_proxy.download_and_transcribe(video_id)
+        steps.append("transcription")
     except Exception as e:
         transcript = ""
         errors.append(str(e))
@@ -110,6 +113,7 @@ def process_video(request, video_id):
             script = pipeline_proxy.summarize_with_gemini(
                 gemini_key, transcript, lang=script_lang
             )
+            steps.append("summarization")
         except Exception as e:
             errors.append(str(e))
     if gemini_key and script:
@@ -117,6 +121,7 @@ def process_video(request, video_id):
             script = pipeline_proxy.generate_discussion_script(
                 gemini_key, script, lang=script_lang
             )
+            steps.append("script generation")
         except Exception as e:
             errors.append(str(e))
 
@@ -127,6 +132,7 @@ def process_video(request, video_id):
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
+            steps.append("audio synthesis")
         except Exception as e:
             errors.append(str(e))
 
@@ -134,7 +140,8 @@ def process_video(request, video_id):
         "video_id": video_id,
         "script": script,
         "audio_b64": audio_b64,
-        "error": " ".join(errors) if errors else None,
+        "error": "\n".join(errors) if errors else None,
+        "steps": "\n".join(steps) if steps else None,
     }
     return render(request, "summary/process.html", context)
 
@@ -147,9 +154,12 @@ def process_multiple(request):
 
     transcripts = []
     errors = []
+    steps = []
     for vid in video_ids:
         try:
             transcripts.append(pipeline_proxy.download_and_transcribe(vid))
+            if "transcription" not in steps:
+                steps.append("transcription")
         except Exception as e:
             errors.append(str(e))
     combined = "\n".join(transcripts)
@@ -167,6 +177,7 @@ def process_multiple(request):
             script = pipeline_proxy.summarize_with_gemini(
                 gemini_key, combined, lang=script_lang
             )
+            steps.append("summarization")
         except Exception as e:
             errors.append(str(e))
     if gemini_key and script:
@@ -174,6 +185,7 @@ def process_multiple(request):
             script = pipeline_proxy.generate_discussion_script(
                 gemini_key, script, lang=script_lang
             )
+            steps.append("script generation")
         except Exception as e:
             errors.append(str(e))
 
@@ -184,6 +196,7 @@ def process_multiple(request):
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
+            steps.append("audio synthesis")
         except Exception as e:
             errors.append(str(e))
 
@@ -191,6 +204,7 @@ def process_multiple(request):
         "video_ids": video_ids,
         "script": script,
         "audio_b64": audio_b64,
-        "error": " ".join(errors) if errors else None,
+        "error": "\n".join(errors) if errors else None,
+        "steps": "\n".join(steps) if steps else None,
     }
     return render(request, "summary/multi_process.html", context)

@@ -8,6 +8,9 @@
     {% if error %}
     <p style="color: red; white-space: pre-wrap;">{{ error }}</p>
     {% endif %}
+    {% if steps %}
+    <pre>{{ steps }}</pre>
+    {% endif %}
     <form method="get">
         <input type="text" name="keyword" placeholder="Keyword" value="{{ keyword }}">
         <input type="text" name="video_url" placeholder="Video URL" value="{{ video_url }}"><br>

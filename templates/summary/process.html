@@ -8,6 +8,9 @@
     {% if error %}
     <p style="color: red; white-space: pre-wrap;">{{ error }}</p>
     {% endif %}
+    {% if steps %}
+    <pre>{{ steps }}</pre>
+    {% endif %}
     {% if script %}
     <h2>Script</h2>
     <pre>{{ script }}</pre>
