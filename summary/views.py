@@ -92,11 +92,11 @@ def process_video(request, video_id):
     """Run pipeline on selected video."""
     errors = []
     steps = []
-    steps.append("download")
+    transcript = ""
     try:
         transcript = pipeline_proxy.download_and_transcribe(video_id)
+        steps.append("transcribed")
     except Exception as e:
-        transcript = ""
         errors.append(str(e))
     script_lang = request.GET.get("lang", "ja")
     audio_lang = request.GET.get("audio", "ja-JP")
@@ -108,31 +108,31 @@ def process_video(request, video_id):
         errors.append("Google Cloud credentials are not configured.")
 
     script = transcript
-    if gemini_key and transcript:
-        steps.append("summarize")
+    if not errors and gemini_key and transcript:
         try:
             script = pipeline_proxy.summarize_with_gemini(
                 gemini_key, transcript, lang=script_lang
             )
+            steps.append("summarized")
         except Exception as e:
             errors.append(str(e))
-    if gemini_key and script:
-        steps.append("script")
+    if not errors and gemini_key and script:
         try:
             script = pipeline_proxy.generate_discussion_script(
                 gemini_key, script, lang=script_lang
             )
+            steps.append("script generated")
         except Exception as e:
             errors.append(str(e))
 
     audio_b64 = None
-    if credentials and script:
-        steps.append("synthesize")
+    if not errors and credentials and script:
         try:
             audio = pipeline_proxy.synthesize_text_to_mp3(
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
+            steps.append("audio synthesized")
         except Exception as e:
             errors.append(str(e))
 
@@ -140,7 +140,7 @@ def process_video(request, video_id):
         "video_id": video_id,
         "script": script,
         "audio_b64": audio_b64,
-        "error": "\n".join(errors) if errors else None,
+        "error": " ".join(errors) if errors else None,
         "steps": "\n".join(steps) if steps else None,
     }
     return render(request, "summary/process.html", context)
@@ -155,12 +155,13 @@ def process_multiple(request):
     transcripts = []
     errors = []
     steps = []
-    steps.append("download")
     for vid in video_ids:
         try:
             transcripts.append(pipeline_proxy.download_and_transcribe(vid))
+            steps.append("transcribed")
         except Exception as e:
             errors.append(str(e))
+            break
     combined = "\n".join(transcripts)
 
     gemini_key = os.environ.get("GEMINI_API_KEY")
@@ -171,31 +172,31 @@ def process_multiple(request):
         errors.append("Google Cloud credentials are not configured.")
 
     script = combined
-    if gemini_key and combined:
-        steps.append("summarize")
+    if not errors and gemini_key and combined:
         try:
             script = pipeline_proxy.summarize_with_gemini(
                 gemini_key, combined, lang=script_lang
             )
+            steps.append("summarized")
         except Exception as e:
             errors.append(str(e))
-    if gemini_key and script:
-        steps.append("script")
+    if not errors and gemini_key and script:
         try:
             script = pipeline_proxy.generate_discussion_script(
                 gemini_key, script, lang=script_lang
             )
+            steps.append("script generated")
         except Exception as e:
             errors.append(str(e))
 
     audio_b64 = None
-    if credentials and script:
-        steps.append("synthesize")
+    if not errors and credentials and script:
         try:
             audio = pipeline_proxy.synthesize_text_to_mp3(
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
+            steps.append("audio synthesized")
         except Exception as e:
             errors.append(str(e))
 
@@ -203,7 +204,7 @@ def process_multiple(request):
         "video_ids": video_ids,
         "script": script,
         "audio_b64": audio_b64,
-        "error": "\n".join(errors) if errors else None,
+        "error": " ".join(errors) if errors else None,
         "steps": "\n".join(steps) if steps else None,
     }
     return render(request, "summary/multi_process.html", context)
