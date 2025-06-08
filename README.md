@@ -6,6 +6,7 @@
 - YouTube Data API キー (`YT_KEY`)
 - Google Gemini API キー (`GEMINI_API_KEY`)
 - 使用する Gemini モデル名 (`GEMINI_MODEL`, デフォルト `models/gemini-pro`)
+  - 別のモデルを使う場合はこの値を変更してください
 - Google Cloud Text-to-Speech の認証情報
 
 環境変数 `GOOGLE_APPLICATION_CREDENTIALS` はサービスアカウント JSON ファイルへのパスを指定してください。
