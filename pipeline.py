@@ -2,6 +2,7 @@
 and audio synthesis."""
 
 import os
+import threading
 from typing import List, Optional, Dict
 import re
 from urllib.parse import urlparse, parse_qs
@@ -11,6 +12,19 @@ from google.cloud import texttospeech_v1 as texttospeech
 import yt_dlp
 import whisper
 import google.generativeai as genai
+
+_MODEL_CACHE: Dict[str, object] = {}
+_MODEL_CACHE_LOCK = threading.Lock()
+
+
+def _get_whisper_model(name: str):
+    """Return cached Whisper model or load and store it."""
+    with _MODEL_CACHE_LOCK:
+        model = _MODEL_CACHE.get(name)
+        if model is None:
+            model = whisper.load_model(name)
+            _MODEL_CACHE[name] = model
+        return model
 
 
 
@@ -203,7 +217,7 @@ def download_and_transcribe(video_id: str, *, out_dir: str = "downloads") -> str
         info = ydl.extract_info(f"https://youtu.be/{video_id}", download=True)
         file_path = ydl.prepare_filename(info)
 
-    model = whisper.load_model(model_name)
+    model = _get_whisper_model(model_name)
     try:
         result = model.transcribe(file_path)
     finally:
