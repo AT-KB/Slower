@@ -195,15 +195,15 @@ def download_and_transcribe(video_id: str, *, out_dir: str = "downloads") -> str
     }
 
     # Use cookies for age-restricted or authenticated videos
-    YTDLP_COOKIES = os.getenv("YTDLP_COOKIES")
-    if YTDLP_COOKIES and os.path.exists(YTDLP_COOKIES):
-        ydl_opts["cookiefile"] = YTDLP_COOKIES
+    cookies_path = os.getenv("YTDLP_COOKIES")
+    if cookies_path and os.path.exists(cookies_path):
+        ydl_opts["cookiefile"] = cookies_path
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(f"https://youtu.be/{video_id}", download=True)
         file_path = ydl.prepare_filename(info)
 
-    WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
-    model = whisper.load_model(WHISPER_MODEL)
+    whisper_model = os.getenv("WHISPER_MODEL", "base")
+    model = whisper.load_model(whisper_model)
     try:
         result = model.transcribe(file_path)
     finally:
