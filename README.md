@@ -6,7 +6,7 @@
 - YouTube Data API キー (`YT_KEY`)
 - Google Gemini API キー (`GEMINI_API_KEY`)
 - 使用する Gemini モデル名 (`GEMINI_MODEL`, デフォルト `models/gemini-pro`)
-  - 別のモデルを使う場合はこの値を変更してください
+  - 省略可。別のモデルを使う場合はこの値を変更してください
 - Google Cloud Text-to-Speech の認証情報
 
 環境変数 `GOOGLE_APPLICATION_CREDENTIALS` はサービスアカウント JSON ファイルへのパスを指定してください。
@@ -52,6 +52,7 @@ GOOGLE_APPLICATION_CREDENTIALS=ここを上書きしてください
 7. 検索の代わりに YouTube の動画 URL を入力すると、その動画から直接要約と音声を生成できます。
 8. 取得した文字起こしを Gemini に渡し、ゆっくり解説用のスクリプトを生成します。
 9. さらにそのスクリプトから、2 人の登場人物による要約ディスカッション台本を Gemini で作成し、画面に表示します。音声合成もこの台本を使用します。
+10. 各ステップの完了後に進捗情報が画面に表示されるため、どこで失敗したか確認できます。
 
 ## 検索対象動画のライセンス制限
 デフォルトでは、YouTube 検索は Creative Commons ライセンスの動画だけに限られます。
