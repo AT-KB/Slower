@@ -104,11 +104,13 @@ def process_video(request, video_id):
             )
         except Exception as e:
             errors.append(str(e))
-    script = (
-        pipeline_proxy.generate_discussion_script(gemini_key, script, lang=script_lang)
-        if gemini_key
-        else script
-    )
+    if gemini_key and script:
+        try:
+            script = pipeline_proxy.generate_discussion_script(
+                gemini_key, script, lang=script_lang
+            )
+        except Exception as e:
+            errors.append(str(e))
 
     audio_b64 = None
     if credentials and script:
@@ -159,11 +161,13 @@ def process_multiple(request):
             )
         except Exception as e:
             errors.append(str(e))
-    script = (
-        pipeline_proxy.generate_discussion_script(gemini_key, script, lang=script_lang)
-        if gemini_key
-        else script
-    )
+    if gemini_key and script:
+        try:
+            script = pipeline_proxy.generate_discussion_script(
+                gemini_key, script, lang=script_lang
+            )
+        except Exception as e:
+            errors.append(str(e))
 
     audio_b64 = None
     if credentials and script:
