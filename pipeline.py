@@ -189,6 +189,11 @@ def download_and_transcribe(
         "outtmpl": os.path.join(out_dir, f"{video_id}.%(ext)s"),
         "format": "bestaudio/best",
     }
+
+    # Use cookies for age-restricted or authenticated videos
+    cookies_path = os.getenv("YTDLP_COOKIES")
+    if cookies_path and os.path.exists(cookies_path):
+        ydl_opts["cookiefile"] = cookies_path
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(f"https://youtu.be/{video_id}", download=True)
         file_path = ydl.prepare_filename(info)
