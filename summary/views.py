@@ -132,7 +132,7 @@ def process_video(request, video_id):
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
-            steps.append("audio synthesized")
+            steps.append("audio created")
         except Exception as e:
             errors.append(str(e))
 
@@ -196,7 +196,7 @@ def process_multiple(request):
                 script, language_code=audio_lang
             )
             audio_b64 = base64.b64encode(audio).decode("utf-8")
-            steps.append("audio synthesized")
+            steps.append("audio created")
         except Exception as e:
             errors.append(str(e))
 
