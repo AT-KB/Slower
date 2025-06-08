@@ -183,7 +183,11 @@ def search_videos(
 def download_and_transcribe(
     video_id: str, *, out_dir: str = "downloads", whisper_model: str = "base"
 ) -> str:
-    """Download audio from YouTube and transcribe with Whisper."""
+    """Download audio from YouTube and transcribe with Whisper.
+
+    The model name is taken from the ``WHISPER_MODEL`` environment variable,
+    falling back to the ``whisper_model`` argument (default ``"base"``).
+    """
     os.makedirs(out_dir, exist_ok=True)
     ydl_opts = {
         "outtmpl": os.path.join(out_dir, f"{video_id}.%(ext)s"),
@@ -198,7 +202,8 @@ def download_and_transcribe(
         info = ydl.extract_info(f"https://youtu.be/{video_id}", download=True)
         file_path = ydl.prepare_filename(info)
 
-    model = whisper.load_model(whisper_model)
+    model_name = os.getenv("WHISPER_MODEL", whisper_model)
+    model = whisper.load_model(model_name)
     try:
         result = model.transcribe(file_path)
     finally:
