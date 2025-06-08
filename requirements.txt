@@ -6,3 +6,4 @@ openai-whisper
 Django>=5.2.2
 gunicorn
 psycopg2-binary
+pytest
