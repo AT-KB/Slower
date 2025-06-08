@@ -5,6 +5,7 @@
 ## 必要なもの
 - YouTube Data API キー (`YT_KEY`)
 - Google Gemini API キー (`GEMINI_API_KEY`)
+- 使用する Gemini モデル名 (`GEMINI_MODEL`, デフォルト `models/gemini-pro`)
 - Google Cloud Text-to-Speech の認証情報
 
 環境変数 `GOOGLE_APPLICATION_CREDENTIALS` はサービスアカウント JSON ファイルへのパスを指定してください。
@@ -22,6 +23,7 @@ DEBUG=True
 DATABASE_URL=
 YT_KEY=ここを上書きしてください
 GEMINI_API_KEY=ここを上書きしてください
+GEMINI_MODEL=models/gemini-pro
 GOOGLE_APPLICATION_CREDENTIALS=ここを上書きしてください
 ```
 

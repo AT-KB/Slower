@@ -207,7 +207,8 @@ def download_and_transcribe(
 def summarize_with_gemini(api_key: str, text: str, *, lang: str = "ja") -> str:
     """Summarize transcript in the specified language using Gemini."""
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-pro")
+    model_name = os.getenv("GEMINI_MODEL", "models/gemini-pro")
+    model = genai.GenerativeModel(model_name)
     prompt = f"次の内容を{lang}でゆっくり解説してください:\n{text}"
     response = model.generate_content(prompt)
     return response.text
@@ -216,7 +217,8 @@ def summarize_with_gemini(api_key: str, text: str, *, lang: str = "ja") -> str:
 def generate_discussion_script(api_key: str, summary: str, *, lang: str = "ja") -> str:
     """Create a two-person discussion script from summary using Gemini."""
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-pro")
+    model_name = os.getenv("GEMINI_MODEL", "models/gemini-pro")
+    model = genai.GenerativeModel(model_name)
     prompt = (
         f"以下の要約をもとに、登場人物AとBが交互に解説する台本を{lang}で書いてください。\n"
         f"{summary}"
