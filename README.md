@@ -10,7 +10,7 @@
 - Google Cloud Text-to-Speech の認証情報
 - yt-dlp で利用する cookie ファイル (`YTDLP_COOKIES`, 任意)
   - 年齢制限付き動画をダウンロードする際に使用
-- Whisper のモデル名 (`WHISPER_MODEL`, デフォルト `base`)
+- Whisper のモデル名 (`WHISPER_MODEL`, デフォルト `tiny`)
   - 文字起こしに使う Whisper モデルを指定
 - Gunicorn のタイムアウト秒数 (`GUNICORN_TIMEOUT`, デフォルト `120`)
   - デプロイ時の処理時間に合わせて調整
@@ -33,19 +33,19 @@ GEMINI_API_KEY=ここを上書きしてください
 GEMINI_MODEL=models/gemini-pro
 GOOGLE_APPLICATION_CREDENTIALS=ここを上書きしてください
 YTDLP_COOKIES=
-WHISPER_MODEL=base
+WHISPER_MODEL=tiny
 WHISPER_BACKEND=openai      # use 'faster' for faster-whisper
 WHISPER_COMPUTE_TYPE=int8   # compute type for faster-whisper
 GUNICORN_TIMEOUT=120
 ```
 
 `YTDLP_COOKIES` には、年齢制限やログインが必要な動画を処理するときに使用する cookie ファイルへのパスを指定します。
-`WHISPER_MODEL` を指定すると Whisper のモデルサイズを変更できます。デフォルトは `base` ですが、`tiny` などの小さいモデルを使うとメモリ使用量を抑えられ、Gunicorn のタイムアウトを避けられる場合があります。
+`WHISPER_MODEL` を指定すると Whisper のモデルサイズを変更できます。デフォルトは `tiny` です。より大きなモデルを使うと精度は上がりますが、処理時間も長くなります。
 `WHISPER_BACKEND` で文字起こしバックエンドを選択できます。`WHISPER_COMPUTE_TYPE` は faster-whisper の精度を決める値で、CPU では `int8` のままにしてください。
 `GUNICORN_TIMEOUT` で Gunicorn のタイムアウト秒数を調整できます。Whisper モデルを低スペックのハードウェアで使用する際は、処理に時間がかかるためより長いタイムアウトが必要になることがあります。
 ## Performance Tips
 
-CPU 環境ではデフォルトの Whisper モデル `base` の処理に数分かかることがあります。
+CPU 環境でもデフォルトの Whisper モデル `tiny` なら比較的速く処理できます。
 `.env` で `WHISPER_MODEL=tiny` または `WHISPER_MODEL=small` を設定すると処理が速くなります。
 必要に応じて `GUNICORN_TIMEOUT` も長めに設定してください。
 ```

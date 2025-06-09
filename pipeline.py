@@ -214,10 +214,10 @@ def download_and_transcribe(video_id: str, *, out_dir: str = "downloads") -> str
     """Download audio from YouTube and transcribe with Whisper.
 
     The model name is read from the ``WHISPER_MODEL`` environment variable
-    (default ``"base"``).
+    (default ``"tiny"``).
     """
     os.makedirs(out_dir, exist_ok=True)
-    model_name = os.getenv("WHISPER_MODEL", "base")
+    model_name = os.getenv("WHISPER_MODEL", "tiny")
     cookies = os.getenv("YTDLP_COOKIES")
     ydl_opts = {
         "outtmpl": os.path.join(out_dir, f"{video_id}.%(ext)s"),
