@@ -37,12 +37,14 @@ WHISPER_MODEL=tiny
 WHISPER_BACKEND=openai      # use 'faster' for faster-whisper
 WHISPER_COMPUTE_TYPE=int8   # compute type for faster-whisper
 GUNICORN_TIMEOUT=120
+PORT=8000
 ```
 
 `YTDLP_COOKIES` には、年齢制限やログインが必要な動画を処理するときに使用する cookie ファイルへのパスを指定します。
 `WHISPER_MODEL` を指定すると Whisper のモデルサイズを変更できます。デフォルトは `tiny` です。より大きなモデルを使うと精度は上がりますが、処理時間も長くなります。
 `WHISPER_BACKEND` で文字起こしバックエンドを選択できます。`WHISPER_COMPUTE_TYPE` は faster-whisper の精度を決める値で、CPU では `int8` のままにしてください。
 `GUNICORN_TIMEOUT` で Gunicorn のタイムアウト秒数を調整できます。Whisper モデルを低スペックのハードウェアで使用する際は、処理に時間がかかるためより長いタイムアウトが必要になることがあります。
+`PORT` は Gunicorn が待ち受けるポート番号です。Railway などの PaaS を利用する場合、サービス側から渡される値で上書きしてください。
 ## Performance Tips
 
 CPU 環境でもデフォルトの Whisper モデル `tiny` なら比較的速く処理できます。
