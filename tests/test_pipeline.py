@@ -41,8 +41,8 @@ faster_whisper_stub.init_calls = []
 class DummyFWModel:
     pass
 
-def WhisperModel(name):
-    faster_whisper_stub.init_calls.append(name)
+def WhisperModel(name, *, compute_type=None):
+    faster_whisper_stub.init_calls.append((name, compute_type))
     return DummyFWModel()
 
 faster_whisper_stub.WhisperModel = WhisperModel
@@ -104,9 +104,19 @@ def test_get_whisper_model_caching_openai():
 
 def test_get_whisper_model_caching_faster():
     os.environ['WHISPER_BACKEND'] = 'faster'
+    os.environ.pop('WHISPER_COMPUTE_TYPE', None)
     pipeline._MODEL_CACHE.clear()
     faster_whisper_stub.init_calls.clear()
     model1 = pipeline._get_whisper_model('tiny')
     model2 = pipeline._get_whisper_model('tiny')
     assert model1 is model2
-    assert faster_whisper_stub.init_calls == ['tiny']
+    assert faster_whisper_stub.init_calls == [('tiny', 'int8')]
+
+
+def test_whisper_compute_type_env_passed():
+    os.environ['WHISPER_BACKEND'] = 'faster'
+    os.environ['WHISPER_COMPUTE_TYPE'] = 'float16'
+    pipeline._MODEL_CACHE.clear()
+    faster_whisper_stub.init_calls.clear()
+    pipeline._get_whisper_model('base')
+    assert faster_whisper_stub.init_calls == [('base', 'float16')]
