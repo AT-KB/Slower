@@ -56,6 +56,14 @@ WHISPER_BACKEND=faster
 ```
 `WHISPER_COMPUTE_TYPE` を設定すると `faster-whisper` の compute_type を変更できます。デフォルトは `int8` で、GPU 環境では `float16` などを指定します。
 
+GPU 非搭載の PC では、以下のように設定すると高速に処理できます。`GUNICORN_TIMEOUT` も長めに調整してください。
+```
+WHISPER_MODEL=tiny
+WHISPER_BACKEND=faster
+WHISPER_COMPUTE_TYPE=int8
+GUNICORN_TIMEOUT=300
+```
+
 ## セットアップ
 1. 依存パッケージをインストールします。
    ```bash
