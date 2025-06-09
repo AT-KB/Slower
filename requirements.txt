@@ -3,6 +3,7 @@ google-api-python-client
 google-cloud-texttospeech
 google-generativeai
 openai-whisper
+faster-whisper
 Django>=5.2.2
 gunicorn
 psycopg2-binary
