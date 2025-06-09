@@ -54,6 +54,7 @@ GUNICORN_TIMEOUT=300
 WHISPER_MODEL=tiny
 WHISPER_BACKEND=faster
 ```
+`WHISPER_COMPUTE_TYPE` を設定すると `faster-whisper` の compute_type を変更できます。デフォルトは `int8` で、GPU 環境では `float16` などを指定します。
 
 ## セットアップ
 1. 依存パッケージをインストールします。

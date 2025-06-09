@@ -26,14 +26,15 @@ def _get_whisper_model(name: str):
     used instead of ``openai-whisper``.
     """
     backend = os.getenv("WHISPER_BACKEND", "openai").lower()
-    cache_key = f"{backend}:{name}"
+    compute_type = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
+    cache_key = f"{backend}:{compute_type}:{name}" if backend == "faster" else f"{backend}:{name}"
     with _MODEL_CACHE_LOCK:
         model = _MODEL_CACHE.get(cache_key)
         if model is None:
             if backend == "faster":
                 from faster_whisper import WhisperModel
 
-                model = WhisperModel(name)
+                model = WhisperModel(name, compute_type=compute_type)
             else:
                 model = whisper.load_model(name)
             _MODEL_CACHE[cache_key] = model
