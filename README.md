@@ -36,6 +36,7 @@ YTDLP_COOKIES=
 WHISPER_MODEL=tiny
 WHISPER_BACKEND=openai      # use 'faster' for faster-whisper
 WHISPER_COMPUTE_TYPE=int8   # compute type for faster-whisper
+WHISPER_CACHE=1             # set 0 to disable model cache
 GUNICORN_TIMEOUT=120
 PORT=8000
 ```
