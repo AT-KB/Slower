@@ -3,6 +3,7 @@ and audio synthesis."""
 
 import os
 import threading
+import gc
 from typing import List, Optional, Dict
 import re
 from urllib.parse import urlparse, parse_qs
@@ -27,9 +28,10 @@ def _get_whisper_model(name: str):
     """
     backend = os.getenv("WHISPER_BACKEND", "openai").lower()
     compute_type = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
+    use_cache = os.getenv("WHISPER_CACHE", "1") != "0"
     cache_key = f"{backend}:{compute_type}:{name}" if backend == "faster" else f"{backend}:{name}"
     with _MODEL_CACHE_LOCK:
-        model = _MODEL_CACHE.get(cache_key)
+        model = _MODEL_CACHE.get(cache_key) if use_cache else None
         if model is None:
             if backend == "faster":
                 from faster_whisper import WhisperModel
@@ -37,7 +39,8 @@ def _get_whisper_model(name: str):
                 model = WhisperModel(name, compute_type=compute_type)
             else:
                 model = whisper.load_model(name)
-            _MODEL_CACHE[cache_key] = model
+            if use_cache:
+                _MODEL_CACHE[cache_key] = model
         return model
 
 
@@ -232,6 +235,8 @@ def download_and_transcribe(video_id: str, *, out_dir: str = "downloads") -> str
         file_path = ydl.prepare_filename(info)
 
     backend = os.getenv("WHISPER_BACKEND", "openai").lower()
+    compute_type = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
+    use_cache = os.getenv("WHISPER_CACHE", "1") != "0"
     model = _get_whisper_model(model_name)
     try:
         if backend == "faster":
@@ -245,6 +250,16 @@ def download_and_transcribe(video_id: str, *, out_dir: str = "downloads") -> str
             os.remove(file_path)
         except OSError:
             pass
+        if not use_cache:
+            cache_key = (
+                f"{backend}:{compute_type}:{model_name}"
+                if backend == "faster"
+                else f"{backend}:{model_name}"
+            )
+            with _MODEL_CACHE_LOCK:
+                _MODEL_CACHE.pop(cache_key, None)
+            del model
+            gc.collect()
     return result_text
 
 
