@@ -34,6 +34,20 @@ sys.modules['google.cloud.texttospeech_v1'] = tts
 # Other stubs
 sys.modules['yt_dlp'] = types.ModuleType('yt_dlp')
 
+# faster_whisper stub
+faster_whisper_stub = types.ModuleType('faster_whisper')
+faster_whisper_stub.init_calls = []
+
+class DummyFWModel:
+    pass
+
+def WhisperModel(name):
+    faster_whisper_stub.init_calls.append(name)
+    return DummyFWModel()
+
+faster_whisper_stub.WhisperModel = WhisperModel
+sys.modules['faster_whisper'] = faster_whisper_stub
+
 # Whisper stub with load_model tracking
 whisper_stub = types.ModuleType('whisper')
 whisper_stub.load_calls = []
@@ -79,8 +93,20 @@ def test_iso_duration_to_seconds():
     assert pipeline._iso_duration_to_seconds('invalid') == 0
 
 
-def test_get_whisper_model_caching():
+def test_get_whisper_model_caching_openai():
+    os.environ['WHISPER_BACKEND'] = 'openai'
+    pipeline._MODEL_CACHE.clear()
+    whisper_stub.load_calls.clear()
     model1 = pipeline._get_whisper_model('base')
     model2 = pipeline._get_whisper_model('base')
     assert model1 is model2
     assert whisper_stub.load_calls == ['base']
+
+def test_get_whisper_model_caching_faster():
+    os.environ['WHISPER_BACKEND'] = 'faster'
+    pipeline._MODEL_CACHE.clear()
+    faster_whisper_stub.init_calls.clear()
+    model1 = pipeline._get_whisper_model('tiny')
+    model2 = pipeline._get_whisper_model('tiny')
+    assert model1 is model2
+    assert faster_whisper_stub.init_calls == ['tiny']

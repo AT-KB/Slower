@@ -49,6 +49,11 @@ CPU 環境ではデフォルトの Whisper モデル `base` の処理に数分�
 WHISPER_MODEL=tiny
 GUNICORN_TIMEOUT=300
 ```
+`faster-whisper` を使う場合は `WHISPER_BACKEND=faster` を指定します。Tiny モデルとの組み合わせで高速に動作します。
+```
+WHISPER_MODEL=tiny
+WHISPER_BACKEND=faster
+```
 
 ## セットアップ
 1. 依存パッケージをインストールします。

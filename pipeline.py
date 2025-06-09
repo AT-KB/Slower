@@ -11,6 +11,7 @@ from googleapiclient.discovery import build
 from google.cloud import texttospeech_v1 as texttospeech
 import yt_dlp
 import whisper
+
 import google.generativeai as genai
 
 _MODEL_CACHE: Dict[str, object] = {}
@@ -18,12 +19,24 @@ _MODEL_CACHE_LOCK = threading.Lock()
 
 
 def _get_whisper_model(name: str):
-    """Return cached Whisper model or load and store it."""
+    """Return cached Whisper model or load and store it.
+
+    The backend is selected via the ``WHISPER_BACKEND`` environment variable
+    (``"openai"`` by default). When set to ``"faster"``, ``faster_whisper`` is
+    used instead of ``openai-whisper``.
+    """
+    backend = os.getenv("WHISPER_BACKEND", "openai").lower()
+    cache_key = f"{backend}:{name}"
     with _MODEL_CACHE_LOCK:
-        model = _MODEL_CACHE.get(name)
+        model = _MODEL_CACHE.get(cache_key)
         if model is None:
-            model = whisper.load_model(name)
-            _MODEL_CACHE[name] = model
+            if backend == "faster":
+                from faster_whisper import WhisperModel
+
+                model = WhisperModel(name)
+            else:
+                model = whisper.load_model(name)
+            _MODEL_CACHE[cache_key] = model
         return model
 
 
@@ -217,15 +230,21 @@ def download_and_transcribe(video_id: str, *, out_dir: str = "downloads") -> str
         info = ydl.extract_info(f"https://youtu.be/{video_id}", download=True)
         file_path = ydl.prepare_filename(info)
 
+    backend = os.getenv("WHISPER_BACKEND", "openai").lower()
     model = _get_whisper_model(model_name)
     try:
-        result = model.transcribe(file_path)
+        if backend == "faster":
+            segments, _info = model.transcribe(file_path)
+            result_text = "".join(seg.text for seg in segments)
+        else:
+            result = model.transcribe(file_path)
+            result_text = result["text"]
     finally:
         try:
             os.remove(file_path)
         except OSError:
             pass
-    return result["text"]
+    return result_text
 
 
 def summarize_with_gemini(api_key: str, text: str, *, lang: str = "ja") -> str:
