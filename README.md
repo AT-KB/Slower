@@ -34,12 +34,15 @@ GEMINI_MODEL=models/gemini-pro
 GOOGLE_APPLICATION_CREDENTIALS=ここを上書きしてください
 YTDLP_COOKIES=
 WHISPER_MODEL=base
+WHISPER_BACKEND=openai   # 'faster' を指定すると faster-whisper を使用
+WHISPER_COMPUTE_TYPE=int8
 GUNICORN_TIMEOUT=120
 ```
 
 `YTDLP_COOKIES` には、年齢制限やログインが必要な動画を処理するときに使用する cookie ファイルへのパスを指定します。
 `WHISPER_MODEL` を指定すると Whisper のモデルサイズを変更できます。デフォルトは `base` ですが、`tiny` などの小さいモデルを使うとメモリ使用量を抑えられ、Gunicorn のタイムアウトを避けられる場合があります。
 `GUNICORN_TIMEOUT` で Gunicorn のタイムアウト秒数を調整できます。Whisper モデルを低スペックのハードウェアで使用する際は、処理に時間がかかるためより長いタイムアウトが必要になることがあります。
+`WHISPER_BACKEND` を `faster` にすると `faster-whisper` を利用できます。`WHISPER_COMPUTE_TYPE` は `faster-whisper` 使用時の精度設定で、CPU では `int8` のままにしてください。
 ## Performance Tips
 
 CPU 環境ではデフォルトの Whisper モデル `base` の処理に数分かかることがあります。
