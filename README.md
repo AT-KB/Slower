@@ -119,6 +119,20 @@ GUNICORN_TIMEOUT=300
    docker run -p 8000:8000 slower
    ```
 
+## トラブルシューティング
+`WORKER TIMEOUT` は CPU のみの環境で Whisper の処理が遅いときに発生することがあります。
+以下のように小さいモデルと `faster` バックエンドを指定するとタイムアウトを防げます。
+
+```bash
+WHISPER_MODEL=tiny
+WHISPER_BACKEND=faster
+WHISPER_COMPUTE_TYPE=int8
+GUNICORN_TIMEOUT=300
+```
+
+これらの設定は GPU を搭載していない PC でも動作し、Railway などのホスティング環境で
+タイムアウトを回避できます。
+
 ## ライセンス
 このプロジェクトは MIT ライセンスの下で公開されています。詳細は LICENSE ファイルを参照してください。
 
